@@ -1,0 +1,18 @@
+{
+  "name": "governance-demo",
+  "version": "0.0.0",
+  "author": "",
+  "license": "MIT",
+  "description": "Not a Node.js project, just for auto-generating change log markdown from commits. See README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure-Samples/devops-governance"
+  },
+  "scripts": {
+    "release": "standard-version --sign"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "standard-version": "^9.0.0"
+  }
+}
