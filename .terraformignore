@@ -1,0 +1,14 @@
+# Configuration
+.env
+*.conf
+*.tfplan
+
+# Directories
+.github/
+images/
+
+# Misc
+.DS_Store
+*.azcli
+*.log
+*.md
