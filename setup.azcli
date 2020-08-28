@@ -1,0 +1,36 @@
+# Configuration
+# -------------
+
+export AZ_GOVDEMO_RG_NAME=public-demos-tfstate-rg
+export AZ_GOVDEMO_STORAGEACCT_NAME=govdemo  # must be globally unique
+export AZ_GOVDEMO_LOCATION=eastus
+
+
+# Resource Group
+# --------------
+# Create a dedicated resource group
+# Configurable: name, location
+az group create \
+	--name $AZ_GOVDEMO_RG_NAME \
+	--location $AZ_GOVDEMO_LOCATION
+
+
+# Storage Account
+# ---------------
+# This holds your actual Terraform state file
+
+az storage account create \
+	--name $AZ_GOVDEMO_STORAGEACCT_NAME \
+	--resource-group $AZ_GOVDEMO_RG_NAME \
+	--kind StorageV2 \
+	--sku Standard_LRS \
+	--https-only true \
+	--allow-blob-public-access false \
+	--tags "demo=e2e-governance"
+
+# Blobs always need a parent container, so we'll create one
+az storage container create \
+	--name terraform \
+	--account-name $AZ_GOVDEMO_STORAGEACCT_NAME \
+	--public-acces off \
+	--auth-mode login
