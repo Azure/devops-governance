@@ -1,12 +1,19 @@
 # Configuration - never check in credentials!
 *.conf
+.env
 
 # Terraform - state and plan files
 .terraform/
 .tfplan
 
+# Debugging
+debug.azcli
+
 # Node.js for autogenerating change logs
 node_modules/
+
+# Mac OS
+.DS_Store
 
 # From template: Visual Studio
 .vs/
