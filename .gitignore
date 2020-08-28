@@ -4,7 +4,7 @@
 
 # Terraform - state and plan files
 .terraform/
-.tfplan
+*.tfplan
 
 # Debugging
 debug.azcli
