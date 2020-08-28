@@ -1,0 +1,4 @@
+storage_account_name="azurestorageaccountname"
+container_name="storagecontainername"
+key="project.tfstate"
+sas_token="?sv=2019-12-12…"
