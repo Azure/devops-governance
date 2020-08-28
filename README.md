@@ -26,17 +26,54 @@ _Credit: [icons by Smashicons](https://www.flaticon.com/authors/smashicons)_
 ## Prerequisites
 
 - An Azure subscription
+  - Logged in via `az login`
+  - `Owner` rights on your subscription
 - An Azure DevOps Organization
 - Terraform
 
+### Warning - run locally only!
+
+⚠️  Run this *only locally* on your machine. It outputs service principal secrets, which you will need for CI/CD workflows
+
 ## Usage
 
-To run the demo, follow these steps:
+### Configure Azure Backend for Terraform
+
+#### 1. Create Storage Account
+
+We will save our Terraform state in Azure Blob Storage
+
+1. Create a storage account to hold Terraform state for this project. Be sure to [disable public read access](https://docs.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-configure?tabs=portal). 
+1. Generate [SAS token](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature) for this storage account
+1. Create [Blob Storage container](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction#containers), e.g. `workspaces`, `projects`
+
+#### 2. Configure Terraform
+
+Create an `azure.conf` file, using `azure.conf.sample` as a template, filling in the placeholders iwth your values.
+
+```
+storage_account_name="azurestorageaccountname"
+container_name="storagecontainername"
+key="project.tfstate"
+sas_token="?sv=2019-12-12…"
+```
+
+#### 3. Terraform Init with Config
+
+Run `init` with our config. 
+
+```
+terraform init -backend-config=./azure.conf
+```
+
+#### 4. Happy Terraforming
 
 
-1.
-2.
-3.
+```
+terraform plan
+terraform apply
+```
+
 
 ## Resources
 
@@ -51,3 +88,11 @@ This demo was created with &hearts; by the FastTrack engineer [julie-ng](https:/
 ## Code of Conduct
 
 If you want to contribute, please first read the Microsoft [Code of Conduct &rarr;](./.github/CODE_OF_CONDUCT.md)
+
+
+## Todo
+
+- [ ] Save service principal secrets to Key Vault instead of outputting them
+- [ ] Create custom "Terraform Contributor" role for service principal so that it can also assign RBAC. Example use case is AAD Pod Identity
+- [ ] Create `.azcli` account for setting up intiial Storage container for Terraform state file
+- [ ] Add instructions to run locally without remote state file
