@@ -1,48 +1,38 @@
-# Project Name
+# Governance on Azure Demo - from DevOps to ARM
 
-(short, 1-3 sentenced, description of the project)
+This demo is used to illustrate end-to-end RBAC, including best practices and pitfalls based on actual customer experience. When securing your resources on Azure, you have to apply role based access control in multiple layers:
 
-## Features
+| Layer | Description |
+|:--|:--|
+| Infrastructure | Azure Resource Manager (ARM), e.g. Azure Portal, Azure CLI |
+| CI/CD Pipelines | Azure DevOps, GitHub Actions |
+| Source Code Management (SCM) | If you use automation and infrastructure as code, your defense starts here. |
 
-This project framework provides the following features:
+### Who is this for?
 
-* Feature 1
-* Feature 2
-* ...
+This demo is targeted at organizations, small and large
 
-## Getting Started
+- with multiple developer teams and applications
+- with a central cloud ops team supporting developer teams - [Cloud Center of Excellence](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/organize/cloud-center-of-excellence) in Microsoft speak
 
-### Prerequisites
+### Demo Results
 
-(ideally very short, if any)
+When you run the demo, you will have the following DevOps Organization setup
 
-- OS
-- Library version
-- ...
+<img src="./images/ado-demo-home.png" alt="" width="800">
 
-### Installation
+_Credit: [icons by Smashicons](https://www.flaticon.com/authors/smashicons)_
 
-(ideally very short)
+## Prerequisites
 
-- npm install [package name]
-- mvn install
-- ...
+- An Azure subscription
+- An Azure DevOps Organization
+- Terraform
 
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
+## Usage
 
 To run the demo, follow these steps:
 
-(Add steps to start up the demo)
 
 1.
 2.
@@ -50,8 +40,14 @@ To run the demo, follow these steps:
 
 ## Resources
 
-(Any additional resources or related projects)
+This demo was created with &hearts; by the FastTrack engineer [julie-ng](https://github.com/julie-ng) based on experience onboarding real Azure customers. Learn more about [FastTrack for Azure &rarr;](https://aka.ms/fasttrackforazure)
 
-- Link to supporting information
-- Link to similar sample
-- ...
+- Todo: add links to Microsoft Documentation
+
+## Contributing
+
+- Please use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) so we can continue to _automate_ the Change Log. Thank you.
+
+## Code of Conduct
+
+If you want to contribute, please first read the Microsoft [Code of Conduct &rarr;](./.github/CODE_OF_CONDUCT.md)
