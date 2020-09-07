@@ -17,7 +17,7 @@ resource "random_string" "suffix" {
 # e.g. module.workspace["gov_shared"]. Suffixes are appended later.
 
 variable "workspaces" {
-  type = map
+  type = map(string)
   default = {
     fruits_dev   = "fruits-dev"
     fruits_prod  = "fruits-prod"
