@@ -90,11 +90,14 @@ resource "azurerm_key_vault_access_policy" "kv_reader" {
   ]
 }
 
-# Key Vault - Example secrets
 
-resource "azurerm_key_vault_secret" "example" {
-  name         = "secret-sauce"
-  value        = "szechuan"
+# KEY VAULT SECRETS
+# -----------------
+# Examples and our service principal credentials
+
+resource "azurerm_key_vault_secret" "workspace_sp_secret" {
+  name         = "workspace-sp-secret"
+  value        = random_password.workspace_sp.result
   key_vault_id = azurerm_key_vault.kv.id
   tags         = var.tags
 
@@ -103,20 +106,9 @@ resource "azurerm_key_vault_secret" "example" {
   ]
 }
 
-resource "azurerm_key_vault_secret" "demo_1" {
-  name         = "kv-api-key"
-  value        = "just-a-demo-never-do-this-irl"
-  key_vault_id = azurerm_key_vault.kv.id
-  tags         = var.tags
-
-  depends_on = [
-    azurerm_key_vault_access_policy.me
-  ]
-}
-
-resource "azurerm_key_vault_secret" "demo_2" {
-  name         = "kv-api-secret"
-  value        = "just-a-demo-never-do-this-irl"
+resource "azurerm_key_vault_secret" "kv_reader_sp_secret" {
+  name         = "kv-reader-sp-secret"
+  value        = random_password.kv_reader_sp.result
   key_vault_id = azurerm_key_vault.kv.id
   tags         = var.tags
 
