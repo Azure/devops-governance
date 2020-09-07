@@ -29,7 +29,8 @@ resource "azurerm_key_vault" "kv" {
   resource_group_name         = azurerm_resource_group.workspace.name
   enabled_for_disk_encryption = true
   tenant_id                   = local.client_tenant_id
-  soft_delete_enabled         = false # so we don't leave anything behind
+  soft_delete_enabled         = true  # false is deprecated
+  soft_delete_retention_days  = 7     # minimum
   purge_protection_enabled    = false # so we can fully delete it
   sku_name                    = "standard"
   tags                        = var.tags
