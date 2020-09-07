@@ -3,7 +3,6 @@ output "workspace" {
     resource_group_name	= azurerm_resource_group.workspace.name
     storage_account     = azurerm_storage_account.storage.name
     key_vault           = azurerm_key_vault.kv.name
-    container_registry  = azurerm_container_registry.acr.name
   }
 }
 

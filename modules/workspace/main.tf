@@ -18,19 +18,6 @@ resource "azurerm_storage_account" "storage" {
   allow_blob_public_access = false
 }
 
-
-# AZURE CONTAINER REGISTRY
-# ------------------------
-
-resource "azurerm_container_registry" "acr" {
-  name                     = local.name_squished
-  resource_group_name      = azurerm_resource_group.workspace.name
-  location                 = azurerm_resource_group.workspace.location
-  sku                      = "Basic"
-  admin_enabled            = false
-}
-
-
 # AZURE KEY VAULT
 # ---------------
 
