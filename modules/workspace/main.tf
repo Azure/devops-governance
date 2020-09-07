@@ -36,6 +36,7 @@ resource "azurerm_key_vault" "kv" {
 }
 
 # Key Vault Access Policy - me
+# Note: this assumes ARM client is central owner of all workspaces
 
 resource "azurerm_key_vault_access_policy" "me" {
   key_vault_id = azurerm_key_vault.kv.id
@@ -54,7 +55,26 @@ resource "azurerm_key_vault_access_policy" "me" {
   ]
 }
 
-# Key Vault Access Policy - Azure DevOps
+# Key Vault Access Policy - workspace service principal
+
+resource "azurerm_key_vault_access_policy" "workspace_sp" {
+  key_vault_id = azurerm_key_vault.kv.id
+  object_id    = azuread_application.workspace_sp.object_id
+  tenant_id    = local.client_tenant_id
+
+  secret_permissions = [
+    "backup",
+    "delete",
+    "get",
+    "list",
+    "purge",
+    "recover",
+    "restore",
+    "set"
+  ]
+}
+
+# Key Vault Access Policy - Read-only e.g. for Azure DevOps
 
 resource "azurerm_key_vault_access_policy" "kv_reader" {
   key_vault_id = azurerm_key_vault.kv.id
