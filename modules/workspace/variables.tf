@@ -7,18 +7,18 @@ variable "name" {
 
 variable "location" {
   type        = string
-  description = "Azure Region for resources. Defaults to Western Europe."
+  description = "Azure Region for resources. Defaults to Europe West."
   default     = "westeurope"
 }
 
 variable "client_tenant_id" {
-  description = "AAD Tenant ID for Azure RM client (of current session)"
+  description = "AAD Tenant ID for Azure Resource Manager (ARM) client. Defaults to current session."
   type        = string
   default     = ""
 }
 
 variable "client_object_id" {
-  description = "Object ID for Azure RM client (of current session)"
+  description = "Object ID for Azure Resource Manager (ARM) client. Defaults to current session."
   type        = string
   default     = ""
 }
