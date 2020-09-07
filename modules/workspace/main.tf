@@ -4,6 +4,7 @@
 resource "azurerm_resource_group" "workspace" {
   name     = "${local.name}-rg"
   location = var.location
+  tags     = var.tags
 }
 
 # STORAGE ACCOUNT
@@ -16,6 +17,7 @@ resource "azurerm_storage_account" "storage" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   allow_blob_public_access = false
+  tags                     = var.tags
 }
 
 # AZURE KEY VAULT
@@ -30,6 +32,7 @@ resource "azurerm_key_vault" "kv" {
   soft_delete_enabled         = false # so we don't leave anything behind
   purge_protection_enabled    = false # so we can fully delete it
   sku_name                    = "standard"
+  tags                        = var.tags
 }
 
 # Key Vault Access Policy - me
@@ -73,6 +76,7 @@ resource "azurerm_key_vault_secret" "example" {
   name         = "secret-sauce"
   value        = "szechuan"
   key_vault_id = azurerm_key_vault.kv.id
+  tags         = var.tags
 
   depends_on = [
     azurerm_key_vault_access_policy.me
@@ -83,6 +87,7 @@ resource "azurerm_key_vault_secret" "demo_1" {
   name         = "kv-api-key"
   value        = "just-a-demo-never-do-this-irl"
   key_vault_id = azurerm_key_vault.kv.id
+  tags         = var.tags
 
   depends_on = [
     azurerm_key_vault_access_policy.me
@@ -93,6 +98,7 @@ resource "azurerm_key_vault_secret" "demo_2" {
   name         = "kv-api-secret"
   value        = "just-a-demo-never-do-this-irl"
   key_vault_id = azurerm_key_vault.kv.id
+  tags         = var.tags
 
   depends_on = [
     azurerm_key_vault_access_policy.me

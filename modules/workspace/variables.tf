@@ -23,6 +23,17 @@ variable "client_object_id" {
   default     = ""
 }
 
+variable "tags" {
+  description = "Tags to apply to Azure Resources"
+  type    = map(string)
+  default = {
+    demo   = "governance"
+    devops = "true"
+    oss    = "terraform"
+    public = "true"
+  }
+}
+
 locals {
   name             = lower(var.name)
   name_squished    = replace(local.name, "-", "")
