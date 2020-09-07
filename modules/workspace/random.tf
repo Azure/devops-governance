@@ -1,4 +1,4 @@
-resource "random_password" "rg_sp" {
+resource "random_password" "workspace_sp" {
   length           = 30
   special          = true
   min_numeric      = 5
