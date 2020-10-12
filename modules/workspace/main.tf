@@ -24,7 +24,7 @@ resource "azurerm_storage_account" "storage" {
 # ---------------
 
 resource "azurerm_key_vault" "kv" {
-  name                        = "${local.name_squished}-kv"
+  name                        = "${local.name}-kv"
   location                    = azurerm_resource_group.workspace.location
   resource_group_name         = azurerm_resource_group.workspace.name
   enabled_for_disk_encryption = true
