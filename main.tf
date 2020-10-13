@@ -16,6 +16,31 @@ locals {
 }
 
 
+# Azure AD Groups
+# ---------------
+# Workspaces generally have 2 groups of actors, general
+# team members who are granted "Contributor" permissions
+# and admins who are granted "Owner" permissions.
+
+variable "teams" {
+  type = map(string)
+  default = {
+    fruits         = "fruits"
+    fruits_admins  = "fruits-admins"
+    veggies_admins = "veggies-admins"
+    veggies        = "veggies"
+    infra          = "infra"
+    infra_admins   = "infra"
+  }
+}
+
+resource "azuread_group" "groups" {
+  for_each                = var.teams
+  name                    = "demo-${each.value}-${local.suffix}"
+  prevent_duplicate_names = true
+}
+
+
 # Workspaces
 # ----------
 # This map defines our workspaces. The keys can be referenced in outputs,
@@ -53,34 +78,11 @@ variable "environments" {
 }
 
 module "workspace" {
-  for_each = var.environments
-  source   = "./modules/workspace"
-  name     = "${each.value.team}-${each.value.env}-${local.suffix}"
-}
-
-
-# Azure AD Groups
-# ---------------
-# Workspaces generally have 2 groups of actors, general
-# team members who are granted "Contributor" permissions
-# and admins who are granted "Owner" permissions.
-
-variable "teams" {
-  type = map(string)
-  default = {
-    fruits         = "fruits"
-    fruits_admins  = "fruits-admins"
-    veggies_admins = "veggies-admins"
-    veggies        = "veggies"
-    infra          = "infra"
-    infra_admins   = "infra"
-  }
-}
-
-resource "azuread_group" "groups" {
-  for_each                = var.teams
-  name                    = "demo-${each.value}-${local.suffix}"
-  prevent_duplicate_names = true
+  for_each       = var.environments
+  source         = "./modules/workspace"
+  name           = "${each.value.team}-${each.value.env}-${local.suffix}"
+  team_group_id  = azuread_group.groups["${each.value.team}"].id
+  admin_group_id = azuread_group.groups["${each.value.team}_admins"].id
 }
 
 

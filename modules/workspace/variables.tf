@@ -15,6 +15,16 @@ variable "location" {
   default     = "westeurope"
 }
 
+variable "team_group_id" {
+  description = "AAD Group ID to receive 'Contributor' permissions"
+  type        = string
+}
+
+variable "admin_group_id" {
+  description = "AAD Group ID to receive 'Owner' permissions"
+  type        = string
+}
+
 variable "client_tenant_id" {
   description = "AAD Tenant ID for Azure Resource Manager (ARM) client. Defaults to current session."
   type        = string

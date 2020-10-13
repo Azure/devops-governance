@@ -21,11 +21,6 @@ resource "azuread_service_principal" "workspace_sp" {
   application_id = azuread_application.workspace_sp.application_id
 }
 
-resource "azurerm_role_assignment" "workspace_sp" {
-  scope                = azurerm_resource_group.workspace.id
-  role_definition_name = "Contributor"
-  principal_id         = azuread_service_principal.workspace_sp.id
-}
 
 # SP - Key Vault Reader (just for Azure Pipeline)
 
