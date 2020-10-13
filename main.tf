@@ -47,7 +47,7 @@ resource "azuread_group" "groups" {
 # e.g. module.workspace["gov_shared"]. Suffixes are appended later.
 
 variable "environments" {
-  type    = map(map(string))
+  type = map(map(string))
 
   default = {
     fru_dev = {
