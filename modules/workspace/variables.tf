@@ -1,8 +1,12 @@
-data "azurerm_client_config" "current" {}
-
 variable "name" {
   type        = string
-  description = "Base name of your workspace that will be used in resource names. Please use lowercase with dashes"
+  description = "Base name of your workspace that will be used in resource names. Please use lowercase with dashes."
+
+
+  validation {
+    condition     = length(var.name) < 20
+    error_message = "Name must be less than 20 characters."
+  }
 }
 
 variable "location" {
@@ -33,6 +37,10 @@ variable "tags" {
     public = "true"
   }
 }
+
+# Variables - Normalized
+
+data "azurerm_client_config" "current" {}
 
 locals {
   name             = lower(var.name)

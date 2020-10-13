@@ -5,6 +5,8 @@
 # Terraform - state and plan files
 .terraform/
 *.tfplan
+*.tfstate
+*.tfstate.*
 
 # Debugging
 debug.azcli
