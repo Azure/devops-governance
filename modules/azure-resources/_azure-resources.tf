@@ -54,14 +54,35 @@ resource "azurerm_key_vault_access_policy" "me" {
     "restore",
     "set"
   ]
+
+  storage_permissions = [
+    "backup",
+    "delete",
+    "deletesas",
+    "get",
+    "getsas",
+    "list",
+    "listsas",
+    "purge",
+    "recover",
+    "regeneratekey",
+    "restore",
+    "set",
+    "setsas",
+    "update"
+  ]
 }
 
 # Key Vault Access Policy - workspace service principal
 
+data "azuread_service_principal" "workspace_sp" {
+  application_id = azuread_application.workspace_sp.application_id # "${var.sp_id}"
+}
+
 resource "azurerm_key_vault_access_policy" "workspace_sp" {
-  key_vault_id = azurerm_key_vault.kv.id
-  object_id    = azuread_application.workspace_sp.object_id
-  tenant_id    = local.client_tenant_id
+  key_vault_id   = azurerm_key_vault.kv.id
+  object_id      = data.azuread_service_principal.workspace_sp.id
+  tenant_id      = local.client_tenant_id
 
   secret_permissions = [
     "backup",
@@ -77,10 +98,14 @@ resource "azurerm_key_vault_access_policy" "workspace_sp" {
 
 # Key Vault Access Policy - Read-only e.g. for Azure DevOps
 
+data "azuread_service_principal" "kv_reader_sp" {
+  application_id = azuread_application.kv_reader_sp.application_id # "${var.sp_id}"
+}
+
 resource "azurerm_key_vault_access_policy" "kv_reader" {
-  key_vault_id = azurerm_key_vault.kv.id
-  object_id    = azuread_application.kv_reader_sp.object_id
-  tenant_id    = local.client_tenant_id
+  key_vault_id   = azurerm_key_vault.kv.id
+  object_id      = data.azuread_service_principal.kv_reader_sp.id
+  tenant_id      = local.client_tenant_id
 
   key_permissions = [
     "get",
@@ -101,10 +126,6 @@ resource "azurerm_key_vault_secret" "workspace_sp_secret" {
   value        = random_password.workspace_sp.result
   key_vault_id = azurerm_key_vault.kv.id
   tags         = var.tags
-
-  depends_on = [
-    azurerm_key_vault_access_policy.me
-  ]
 }
 
 resource "azurerm_key_vault_secret" "kv_reader_sp_secret" {
@@ -112,8 +133,4 @@ resource "azurerm_key_vault_secret" "kv_reader_sp_secret" {
   value        = random_password.kv_reader_sp.result
   key_vault_id = azurerm_key_vault.kv.id
   tags         = var.tags
-
-  depends_on = [
-    azurerm_key_vault_access_policy.me
-  ]
 }
