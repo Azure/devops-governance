@@ -1,0 +1,77 @@
+# Build numbering format
+name: $(BuildID)
+
+trigger:
+  branches:
+    include:
+    - release
+  paths:
+    exclude:
+    - '*.md'
+    - 'images/*'
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+variables:
+  - group: e2e-gov-demo-kv
+
+stages:
+- stage: ci_stage
+  displayName: Terraform CI (validate and lint)
+  jobs:
+  - job: ci_job
+    displayName: Validate and Lint
+    steps:
+    - bash: terraform version
+      displayName: terraform version
+
+    - bash: terraform init -backend=false
+      displayName: terraform init
+
+    - bash: |
+        terraform validate
+        terraform fmt -check
+      displayName: terraform validate and Lint
+
+- stage: cd_stage
+  displayName: Terraform Deploy
+  jobs:
+  - job: deploy
+    displayName: Deploy
+    steps:
+    - bash: |
+        terraform init \
+          -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
+          -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
+          -backend-config="key=$TF_STATE_BLOB_FILE" \
+          -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
+      displayName: Terraform Init
+      env:
+        TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
+        TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
+        TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
+        TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
+
+    - bash: terraform plan -out=deployment.tfplan -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
+      displayName: Terraform Plan (ignores drift)
+      env:
+        ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
+        ARM_CLIENT_ID:              $(kv-arm-client-id)
+        ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
+        ARM_TENANT_ID:              $(kv-arm-tenant-id)
+        AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
+        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
+        AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
+
+    - bash: terraform apply -auto-approve deployment.tfplan
+      displayName: Terraform Apply
+      env:
+        ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
+        ARM_CLIENT_ID:              $(kv-arm-client-id)
+        ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
+        ARM_TENANT_ID:              $(kv-arm-tenant-id)
+        AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
+        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
