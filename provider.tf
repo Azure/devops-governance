@@ -14,8 +14,8 @@ provider "azuredevops" {
 
 # Store Terraform Stage in Azure Storage Account (see azure.conf.sample)
 terraform {
-  # backend "azurerm" {
-  # }
+  backend "azurerm" {
+  }
 }
 
 # So we can give current user access to resources too

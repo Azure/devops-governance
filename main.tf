@@ -31,7 +31,7 @@ module "ado_standard_permissions" {
   for_each       = var.projects
   source         = "./modules/azure-devops-permissions"
   ado_project_id = azuredevops_project.team_projects["proj_${each.value.team}"].id
-  team_aad_id    = azuread_group.groups["${each.value.team}"].id
+  team_aad_id    = azuread_group.groups[each.value.team].id
   admin_aad_id   = azuread_group.groups["${each.value.team}_admins"].id
 }
 
@@ -102,11 +102,12 @@ module "collaboration_permissions_veggies" {
 # ----------
 
 module "workspace" {
-  for_each       = var.environments
-  source         = "./modules/azure-resources"
-  name           = "${each.value.team}-${each.value.env}-${local.suffix}"
-  team_group_id  = azuread_group.groups["${each.value.team}"].id
-  admin_group_id = azuread_group.groups["${each.value.team}_admins"].id
+  for_each             = var.environments
+  source               = "./modules/azure-resources"
+  name                 = "${each.value.team}-${each.value.env}-${local.suffix}"
+  team_group_id        = azuread_group.groups[each.value.team].id
+  admin_group_id       = azuread_group.groups["${each.value.team}_admins"].id
+  superadmins_group_id = var.superadmins_aad_object_id
 }
 
 

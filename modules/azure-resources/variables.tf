@@ -25,6 +25,11 @@ variable "admin_group_id" {
   type        = string
 }
 
+variable "superadmins_group_id" {
+  type        = string
+  description = "Required: object ID of the AAD group for super admins, used to apply key vault access policies."
+}
+
 variable "client_tenant_id" {
   description = "AAD Tenant ID for Azure Resource Manager (ARM) client. Defaults to current session."
   type        = string

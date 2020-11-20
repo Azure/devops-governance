@@ -2,6 +2,7 @@
 .env
 *.conf
 *.tfplan
+local.auto.tfvars
 
 # Directories
 .github/

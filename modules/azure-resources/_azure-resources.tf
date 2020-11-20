@@ -36,12 +36,12 @@ resource "azurerm_key_vault" "kv" {
   tags                        = var.tags
 }
 
-# Key Vault Access Policy - me
-# Note: this assumes ARM client is central owner of all workspaces
+# Key Vault Access Policy - superadmins
+# e.g. admins as well has limited infrastructure service principals
 
-resource "azurerm_key_vault_access_policy" "me" {
+resource "azurerm_key_vault_access_policy" "superadmins" {
   key_vault_id = azurerm_key_vault.kv.id
-  object_id    = local.client_object_id
+  object_id    = var.superadmins_group_id
   tenant_id    = local.client_tenant_id
 
   secret_permissions = [
