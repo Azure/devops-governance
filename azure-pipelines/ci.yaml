@@ -1,0 +1,32 @@
+# Build numbering format
+name: $(BuildID)
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+    - dev
+    - feat/*
+    - fix/*
+  paths:
+    exclude:
+    - '*.md'
+    - 'images/*'
+
+pr:
+- main
+- feat/*
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+steps:
+- bash: terraform init -backend=false
+  displayName: init
+
+- bash: terraform validate
+  displayName: validate
+
+- bash: terraform fmt -check
+  displayName: check format / lint
