@@ -44,7 +44,7 @@ jobs:
   #     [[ $STATUS == "0" ]] && exit 0 || exit 1
 
   - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
-    continueOnError: true
+    # continueOnError: true
     displayName: Terraform - Detect configuration drift
     name: planStep
     env:
@@ -67,9 +67,10 @@ jobs:
 - job: PostCommentJob
   displayName: Post Results to GitHub
   dependsOn: DetectDriftJob
+  condition: always()
   variables:
-    - name: has-drift
-      value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+    # - name: has-drift
+    #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
 
     # - name: tf-plan-output
     #   value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
@@ -80,9 +81,13 @@ jobs:
     - name: ado-project-name
       value: e2e-governance-demo
 
+    - name: build-id
+      value: ${{ variables['Build.BuildId'] }}
+
   steps:
   - task: GitHubComment@0
-    condition: eq(variables['has-drift'], false)
+    # condition: eq(variables['has-drift'], false)
+    condition: succeeded('DetectDriftJob')
     displayName: Post - No Drift
     inputs:
       gitHubConnection: $(github-connection-name)
@@ -90,21 +95,9 @@ jobs:
       comment: |
         🟢 No configuration drift detected
 
-  - bash: |
-      echo "Try workaround, probably won't work b/c env vars are not persisted across steps"
-      GITHUB_COMMENT=$(cat <<-END
-          ```
-          This is line one.
-          This is line two.
-          This is line three.
-          ```
-      END
-      )
-      echo $GITHUB_COMMENT
-    condition: variables['has-drift']
-
   - task: GitHubComment@0
-    condition: variables['has-drift']
+    # condition: variables['has-drift']
+    condition: failed('DetectDriftJob')
     displayName: Post - Has Drift
     inputs:
       gitHubConnection: $(github-connection-name)
