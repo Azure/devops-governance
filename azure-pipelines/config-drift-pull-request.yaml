@@ -90,16 +90,29 @@ jobs:
       comment: |
         🟢 No configuration drift detected
 
+  - bash: |
+      echo "Try workaround, probably won't work b/c env vars are not persisted across steps"
+      GITHUB_COMMENT=$(cat <<-END
+          ```
+          This is line one.
+          This is line two.
+          This is line three.
+          ```
+      END
+      )
+      echo $GITHUB_COMMENT
+    condition: variables['has-drift']
+
   - task: GitHubComment@0
     condition: variables['has-drift']
     displayName: Post - Has Drift
     inputs:
       gitHubConnection: $(github-connection-name)
       repositoryName: $(github-repo-name)
-      comment: |
-        ### ⚠️ &nbsp;**CONFIGURATION DRIFT DETECTED** ⚠️
+      # comment: |
+      #   ### ⚠️ &nbsp;**CONFIGURATION DRIFT DETECTED** ⚠️
 
-        Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
-        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$[ variables['Build.BuildId'] ]&view=results
+      #   Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
+      #   https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$[ variables['Build.BuildId'] ]&view=results
 
-        Proceed with caution!
+      #   Proceed with caution!
