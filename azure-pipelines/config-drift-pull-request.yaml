@@ -59,7 +59,7 @@ jobs:
     displayName: Save terraform plan output
 
 - job: PostCommentJob
-  displayName: Post Results
+  displayName: Post Results to GitHub
   dependsOn: DetectDriftJob
   variables:
     - name: has-drift
@@ -69,7 +69,7 @@ jobs:
   steps:
   - task: GitHubComment@0
     condition: eq(variables['has-drift'], false)
-    displayName: Post Terraform Plan to Pull Request
+    displayName: Post - No Drift
     inputs:
       gitHubConnection: $(github-connection-name)
       repositoryName: $(github-repo-name)
@@ -78,7 +78,7 @@ jobs:
 
   - task: GitHubComment@0
     condition: variables['has-drift']
-    displayName: Post Terraform Plan to Pull Request
+    displayName: Post - Has Drift
     inputs:
       gitHubConnection: $(github-connection-name)
       repositoryName: $(github-repo-name)
