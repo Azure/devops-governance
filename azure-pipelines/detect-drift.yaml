@@ -55,7 +55,7 @@ stages:
 
         # Save Exit Code
         STATUS=${PIPESTATUS[@]}
-        echo "##vso[task.setvariable variable=tfPlanExit;isOutput=true]$("echo $STATUS")"
+        echo "##vso[task.setvariable variable=tfPlanExit;isOutput=true]$("echo $STATUS)"
         [[ $STATUS == "0" ]] && exit 0 || exit 1
       displayName: Terraform - Detect configuration drift
       # continueOnError: true  # so we can post result to Pull Request
@@ -76,6 +76,8 @@ stages:
 
     # - bash: echo $(tfPlanOutput)
     #   displayName: debug tf plan output
+    - bash: echo $(tfPlanExit)
+      displayName: debug tf plan exit
 
 
 # Stage: Pull Request Comment
