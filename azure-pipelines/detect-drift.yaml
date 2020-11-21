@@ -58,7 +58,7 @@ stages:
         echo "##vso[task.setvariable variable=tfPlanExit;isOutput=true]$("echo $STATUS")"
         [[ $STATUS == "0" ]] && exit 0 || exit 1
       displayName: Terraform - Detect configuration drift
-      continueOnError: true  # so we can post result to Pull Request
+      # continueOnError: true  # so we can post result to Pull Request
       name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
@@ -82,7 +82,7 @@ stages:
 # ---------------------------
 - stage: PRCommentStage
   displayName: Pull Request Comment
-  condition: eq(variables['Build.Reason'], 'PullRequest')
+  condition: and(succeededOrFailed(), eq(variables['Build.Reason'], 'PullRequest'))
   variables:
     github-repo-name:       Azure-Samples/devops-governance
     github-connection-name: Azure-Samples
