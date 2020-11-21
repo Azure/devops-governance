@@ -17,10 +17,10 @@ stages:
 # Stage: Terraform Plan
 # ---------------------
 - stage: TFPlanStage
-  displayName: Terraform Plan
+  displayName: Detect Drift
   jobs:
   - job: DetectDriftJob
-    displayName: Detect Drift
+    displayName: Terraform Plan
     steps:
     - bash: |
         terraform init \
@@ -61,10 +61,6 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-    - bash: echo "Exit Code - $PLAN_EXIT_CODE"
-      displayName: Confirm Exit Code
-      env:
-        PLAN_EXIT_CODE: variables['tfPlanExit']
 
     # # Multiline variables are not supported in Azure DevOps 😕
     # - bash: |
@@ -74,11 +70,13 @@ stages:
     # - bash: echo $(tfPlanOutput)
     #   displayName: debug tf plan output
 
+
+
 # Stage: Pull Request Comment
 # ---------------------------
-
 - stage: PRCommentStage
-  displayName: Post Results to GitHub
+  displayName: Pull Request Comment
+  condition: eq(variables['Build.Reason'], 'PullRequest')
   # variables:
   #   github-repo-name:       Azure-Samples/devops-governance
   #   github-connection-name: Azure-Samples
@@ -93,44 +91,27 @@ stages:
   # - name: was-not-run
   #   value: in($[ dependencies.TFPlanStage.result ], 'Canceled', 'Skipped')
   variables:
-  - name: github-repo-name
+  - name:  github-repo-name
     value: Azure-Samples/devops-governance
-  - name: github-connection-name
+  - name:  github-connection-name
     value: Azure-Samples
-  - name: ado-org-name
+  - name:  ado-org-name
     value: julie-msft
-  - name: ado-project-name
+  - name:  ado-project-name
     value: e2e-governance-demo
-  - name: build-id
-    value: ${{ variables['Build.BuildId'] }}
-  - name: has-drift
+  - name:  has-drift
     value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+
   jobs:
   - job: PostCommentJob
-    displayName: Add Comment to Pull Request
-    # variables:
-    # - name: github-repo-name
-    #   value: Azure-Samples/devops-governance
-    # - name: github-connection-name
-    #   value: Azure-Samples
-    # - name: ado-org-name
-    #   value: julie-msft
-    # - name: ado-project-name
-    #   value: e2e-governance-demo
-    # - name: build-id
-    #   value: ${{ variables['Build.BuildId'] }}
-    # - name: has-drift
-    #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
-    # - name: has-drift
-    #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
-    # - name: tf-plan-output
-    #   value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
+    displayName: Post to GitHub
     steps:
     - task: GitHubComment@0
       condition: eq(variables['has-drift'], false)
       displayName: Post - No Drift
       inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
+        # gitHubConnection: ${{ variables['github-connection-name'] }}
+        gitHubConnection: $(github-connection-name)
         repositoryName: $(github-repo-name)
         comment: |
           🟢 No configuration drift detected
@@ -139,12 +120,12 @@ stages:
       condition: variables['has-drift']
       displayName: Post - Has Drift
       inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
+        # gitHubConnection: ${{ variables['github-connection-name'] }}
+        gitHubConnection: $(github-connection-name)
         repositoryName: $(github-repo-name)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
 
-          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
-          https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$(build-id)&view=results
+          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines.
 
           Proceed with caution!
