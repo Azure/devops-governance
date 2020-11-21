@@ -6,7 +6,8 @@ pool:
 
 trigger: none
 
-pr: none
+pr:
+- release
 
 schedules:
   - cron: "0 0 * * *"
