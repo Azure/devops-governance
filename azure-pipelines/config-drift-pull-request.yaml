@@ -86,8 +86,7 @@ jobs:
 
   steps:
   - task: GitHubComment@0
-    # condition: eq(variables['has-drift'], false)
-    condition: succeeded('DetectDriftJob')
+    condition: eq(dependencies.DetectDriftJob.result, 'Succeeded')
     displayName: Post - No Drift
     inputs:
       gitHubConnection: $(github-connection-name)
@@ -96,8 +95,16 @@ jobs:
         🟢 No configuration drift detected
 
   - task: GitHubComment@0
-    # condition: variables['has-drift']
-    condition: failed('DetectDriftJob')
+    condition: in(dependencies.DetectDriftJob.result, 'Canceled', 'Skipped')
+    displayName: Post - Was Cancelled
+    inputs:
+      gitHubConnection: $(github-connection-name)
+      repositoryName: $(github-repo-name)
+      comment: |
+        ### ⚠️ &nbsp;Job cancelled or skipped
+
+  - task: GitHubComment@0
+    condition: in(dependencies.DetectDriftJob.result, 'Failed', 'SucceededWithIssues')
     displayName: Post - Has Drift
     inputs:
       gitHubConnection: $(github-connection-name)
