@@ -77,13 +77,13 @@ stages:
 
 - stage: PRCommentStage
   displayName: Post Results to GitHub
-  variables:
-    github-repo-name:       Azure-Samples/devops-governance
-    github-connection-name: Azure-Samples
-    ado-org-name:           julie-msft
-    ado-project-name:       e2e-governance-demo
-    build-id:               $(BuildID) # ${{ variables['Build.BuildId'] }}
-    has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+  # variables:
+  #   github-repo-name:       Azure-Samples/devops-governance
+  #   github-connection-name: Azure-Samples
+  #   ado-org-name:           julie-msft
+  #   ado-project-name:       e2e-governance-demo
+  #   build-id:               $(BuildID) # ${{ variables['Build.BuildId'] }}
+  #   has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
   # - name: has-no-drift
   #   value: eq($[ dependencies.TFPlanStage.result ], 'Succeeded')
   # - name: has-drift
@@ -93,6 +93,13 @@ stages:
   jobs:
   - job: PostCommentJob
     displayName: Post Results to GitHub
+    variables:
+      github-repo-name:       Azure-Samples/devops-governance
+      github-connection-name: Azure-Samples
+      ado-org-name:           julie-msft
+      ado-project-name:       e2e-governance-demo
+      build-id:               $(BuildID) # ${{ variables['Build.BuildId'] }}
+      has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: has-drift
     #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: tf-plan-output
