@@ -79,18 +79,18 @@ stages:
 - stage: PRCommentStage
   displayName: Post Results to GitHub
   dependsOn: TFPlanStage
+  variables:
+  - name: has-no-drift
+    value: eq(dependencies.TFPlanStage.DetectDriftJob.result, 'Succeeded')
+  - name: has-drift
+    value: in(dependencies.TFPlanStage.DetectDriftJob.result, 'Failed', 'SucceededWithIssues')
+  - name: was-not-run
+    value: in(dependencies.TFPlanStage.DetectDriftJob.result, 'Canceled', 'Skipped')
   jobs:
   - job: PostCommentJob
     displayName: Post Results to GitHub
     # dependsOn: DetectDriftJob
     # condition: always()
-    variables:
-    - name: has-no-drift
-      value: eq(dependencies.DetectDriftJob.result, 'Succeeded')
-    - name: has-drift
-      value: in(dependencies.DetectDriftJob.result, 'Failed', 'SucceededWithIssues')
-    - name: was-not-run
-      value: in(dependencies.DetectDriftJob.result, 'Canceled', 'Skipped')
     # - name: has-drift
     #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: tf-plan-output
