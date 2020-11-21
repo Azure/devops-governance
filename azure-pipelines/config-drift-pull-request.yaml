@@ -45,10 +45,10 @@ steps:
     AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
     AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
     AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
-  continueOnError: true # Human approval is required at Pull Request
+  # continueOnError: true # Human approval is required at Pull Request
 
 - task: GitHubComment@0
-  condition: and(failed())
+  condition: failed()
   displayName: Post Terraform Plan to Pull Request
   inputs:
     gitHubConnection: $(github-connection-name)
