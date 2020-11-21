@@ -47,7 +47,7 @@ stages:
 
         # Save Exit Code
         STATUS=${PIPESTATUS[@]}
-        echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
+        echo "##vso[task.setvariable variable=tfPlanExit;isOutput=true]$("echo $STATUS")"
         [[ $STATUS == "0" ]] && exit 0 || exit 1
       displayName: Terraform - Detect configuration drift
       continueOnError: true  # so we can post result to Pull Request
@@ -94,7 +94,7 @@ stages:
   #   value: in($[ dependencies.TFPlanStage.result ], 'Canceled', 'Skipped')
   jobs:
   - job: PostCommentJob
-    displayName: Post Results to GitHub
+    displayName: Add Comment to Pull Request
     variables:
     - name: github-repo-name
       value: Azure-Samples/devops-governance
