@@ -55,7 +55,7 @@ jobs:
 
 - job: PostCommentJob
   displayName: Post Results
-  dependsOn: detect-drift-job
+  dependsOn: DetectDriftJob
   variables:
     - name: has-drift
       value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
