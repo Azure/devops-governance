@@ -44,9 +44,19 @@ stages:
         TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
     - bash: |
+        # Remember Exit Code
+        set -o pipefail
+
+        # Run `terraform plan` and save output
         terraform plan \
           -detailed-exitcode \
           -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
+
+        # Save Exit Code
+        STATUS=${PIPESTATUS[@]}
+        echo "##vso[task.setvariable variable=exitCode;isOutput=true]$("echo $STATUS")"
+        echo status: $STATUS
+        if [[ $STATUS == "0" ]]; then exit 0; else exit 1; fi
       displayName: Terraform - Detect configuration drift
       name: planStep
       env:
@@ -58,29 +68,24 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
+    - bash: echo got exit code - $(exitCode)
+      displayName: debug exit code
+
     # # Multiline variables are not supported in Azure DevOps 😕
     # - bash: |
     #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
     #   displayName: Save terraform plan output
 
-    - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]false"
-      condition: succeeded()
-      displayName: set has_drift to false
+    # # works, but not useful because distinct step
+    # - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]false"
+    #   condition: succeeded()
+    #   displayName: set has_drift to false
 
-    - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
-      condition: failed()
-      displayName: set has_drift to true
+    # # works, but not useful because distinct step
+    # - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
+    #   condition: failed()
+    #   displayName: set has_drift to true
 
-    - bash: echo "##vso[task.setvariable variable=got_drift;isOutput=true]$GOTDRIFT"
-      variables:
-        ${{ if succeeded() }}:
-          GOTDRIFT: false
-        ${{ if failed() }}:
-          GOTDRIFT: true
-      displayName: set got_drift
-
-    - bash: echo got drift - $GOT_DRIFT
-      displayName: echo got_drift
 
 
 # Stage: Pull Request Comment
@@ -93,39 +98,42 @@ stages:
     github-connection-name: Azure-Samples
     ado-org-name:           julie-msft
     ado-project-name:       e2e-governance-demo
-    has-drift:              $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['ProduceVar.exitCode'] ]
+    exit-code:              $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['planStep.exitCode'] ]
   jobs:
   - job: TestOutput
     steps:
+    - bash: echo what is $[ variables['exit-code'] ] ?
+      displayName: echo exit code
+
     - bash: echo "all good"
-      condition: eq(variables['has-drift'], 'false')
+      condition: eq(variables['exit-code'], '0')
       displayName: no drift
 
     - bash: echo "not working"
-      condition: eq(variables['has-drift'], 'true')
+      condition: eq(variables['exit-code'], '1')
       displayName: got drift
 
-  - job: PostCommentJob
-    displayName: Post to GitHub
-    steps:
-    - task: GitHubComment@0
-      condition: eq(variables['has-drift'], false)
-      displayName: Post - No Drift
-      inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
-        repositoryName: $(github-repo-name)
-        comment: |
-          🟢 No configuration drift detected
+  # - job: PostCommentJob
+  #   displayName: Post to GitHub
+  #   steps:
+  #   - task: GitHubComment@0
+  #     condition: eq(variables['has-drift'], false)
+  #     displayName: Post - No Drift
+  #     inputs:
+  #       gitHubConnection: ${{ variables['github-connection-name'] }}
+  #       repositoryName: $(github-repo-name)
+  #       comment: |
+  #         🟢 No configuration drift detected
 
-    - task: GitHubComment@0
-      condition: variables['has-drift']
-      displayName: Post - Has Drift
-      inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
-        repositoryName: $(github-repo-name)
-        comment: |
-          ### ⚠️ &nbsp;Configuration Drift Detected
+  #   - task: GitHubComment@0
+  #     condition: variables['has-drift']
+  #     displayName: Post - Has Drift
+  #     inputs:
+  #       gitHubConnection: ${{ variables['github-connection-name'] }}
+  #       repositoryName: $(github-repo-name)
+  #       comment: |
+  #         ### ⚠️ &nbsp;Configuration Drift Detected
 
-          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
+  #         Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
 
-          Proceed with caution!
+  #         Proceed with caution!
