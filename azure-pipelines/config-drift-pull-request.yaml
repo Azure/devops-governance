@@ -100,6 +100,6 @@ jobs:
         ### ⚠️ &nbsp;**CONFIGURATION DRIFT DETECTED** ⚠️
 
         Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
-        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=${{ variables['Build.BuildId'] }}&view=results
+        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$[ variables['Build.BuildId'] ]&view=results
 
         Proceed with caution!
