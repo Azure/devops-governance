@@ -44,7 +44,7 @@ jobs:
   #     [[ $STATUS == "0" ]] && exit 0 || exit 1
 
   - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
-    # continueOnError: true
+    continueOnError: true
     displayName: Terraform - Detect configuration drift
     name: planStep
     env:
