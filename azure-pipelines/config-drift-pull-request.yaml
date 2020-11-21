@@ -82,7 +82,7 @@ stages:
   jobs:
   - job: PostCommentJob
     displayName: Post Results to GitHub
-    dependsOn: DetectDriftJob
+    # dependsOn: DetectDriftJob
     # condition: always()
     variables:
     - name: has-no-drift
