@@ -1,0 +1,61 @@
+# Build numbering format
+name: $(BuildID)
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+trigger: none
+
+pr:
+- release
+
+variables:
+  - group: e2e-gov-demo-kv
+
+  - name: github-repo-name
+    value: Azure-Samples/devops-governance
+
+  - name: github-connection-name
+    value: Azure-Samples
+
+steps:
+- bash: |
+    terraform init \
+      -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
+      -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
+      -backend-config="key=$TF_STATE_BLOB_FILE" \
+      -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
+  displayName: Terraform - Init
+  env:
+    TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
+    TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
+    TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
+    TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
+
+- bash: |
+    terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID > plan-output.txt
+    echo "##vso[task.setvariable variable=tf-plan-output]$(cat ./plan-output.txt)"
+    rm plan-output.txt
+  displayName: Terraform - Detect configuration drift
+  env:
+    ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
+    ARM_CLIENT_ID:              $(kv-arm-client-id)
+    ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
+    ARM_TENANT_ID:              $(kv-arm-tenant-id)
+    AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
+    AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
+    AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
+  continueOnError: true # Human approval is required at Pull Request
+
+- task: GitHubComment@0
+  condition: and(failed())
+  displayName: Post Terraform Plan to Pull Request
+  inputs:
+    gitHubConnection: $(github-connection-name)
+    repositoryName: $(github-repo-name)
+    comment: |
+      It failed (testing PR comment).
+
+      ```bash
+      $(tf-plan-output)
+      ```
