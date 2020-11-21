@@ -38,7 +38,7 @@ jobs:
   # Run `terraform plan` and preserve exit code and output for downstream steps
   - bash: |
       set -o pipefail
-      terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID > plan-output.txt
+      terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt
       STATUS=${PIPESTATUS[@]}
       echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
       [[ $STATUS == "0" ]] && exit 0 || exit 1
@@ -57,6 +57,9 @@ jobs:
   - bash: |
       echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
     displayName: Save terraform plan output
+
+  - bash: echo $(tfPlanOutput)
+    displayName: debug tf plan output
 
 - job: PostCommentJob
   displayName: Post Results to GitHub
