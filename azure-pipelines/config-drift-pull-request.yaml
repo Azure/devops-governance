@@ -35,10 +35,14 @@ jobs:
       TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
       TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
+  # Run `terraform plan` and preserve exit code and output for downstream steps
   - bash: |
       set -o pipefail
       terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID > plan-output.txt
-      echo "##vso[task.setvariable variable=tfPlanExit]$("echo ${PIPESTATUS[@]}")"
+      STATUS=${PIPESTATUS[@]}
+      echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
+      [[ $STATUS == "0" ]] && exit 0 || exit 1
+    continueOnError: true
     displayName: Terraform - Detect configuration drift
     name: planStep
     env:
@@ -49,6 +53,7 @@ jobs:
       AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
       AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
       AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
+
   - bash: |
       echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
     displayName: Save terraform plan output
@@ -83,5 +88,5 @@ jobs:
         Proceed with caution!
 
         ```bash
-        $(tf-plan-output)
+        ${{ variables['tf-plan-output'] }}
         ```
