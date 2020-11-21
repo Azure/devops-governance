@@ -79,14 +79,14 @@ stages:
 
 - stage: PRCommentStage
   displayName: Post Results to GitHub
-  dependsOn: TFPlanStage
+  # dependsOn: TFPlanStage
   variables:
-  - name: has-no-drift
-    value: eq($[ dependencies.TFPlanStage.result ], 'Succeeded')
-  - name: has-drift
-    value: in($[ dependencies.TFPlanStage.result ], 'Failed', 'SucceededWithIssues')
-  - name: was-not-run
-    value: in($[ dependencies.TFPlanStage.result ], 'Canceled', 'Skipped')
+  # - name: has-no-drift
+  #   value: eq($[ dependencies.TFPlanStage.result ], 'Succeeded')
+  # - name: has-drift
+  #   value: in($[ dependencies.TFPlanStage.result ], 'Failed', 'SucceededWithIssues')
+  # - name: was-not-run
+  #   value: in($[ dependencies.TFPlanStage.result ], 'Canceled', 'Skipped')
   jobs:
   - job: PostCommentJob
     displayName: Post Results to GitHub
@@ -98,7 +98,8 @@ stages:
     #   value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
     steps:
     - task: GitHubComment@0
-      condition: ${{ variables['has-no-drift'] }}
+      # condition: ${{ variables['has-no-drift'] }}
+      condition: succeeded('DetectDriftJob')
       displayName: Post - No Drift
       inputs:
         gitHubConnection: $(github-connection-name)
@@ -106,17 +107,18 @@ stages:
         comment: |
           🟢 No configuration drift detected
 
-    - task: GitHubComment@0
-      condition: ${{ variables['was-not-run'] }}
-      displayName: Post - Was Cancelled
-      inputs:
-        gitHubConnection: $(github-connection-name)
-        repositoryName: $(github-repo-name)
-        comment: |
-          ### ⚠️ &nbsp;Job cancelled or skipped
+    # - task: GitHubComment@0
+    #   condition: ${{ variables['was-not-run'] }}
+    #   displayName: Post - Was Cancelled
+    #   inputs:
+    #     gitHubConnection: $(github-connection-name)
+    #     repositoryName: $(github-repo-name)
+    #     comment: |
+    #       ### ⚠️ &nbsp;Job cancelled or skipped
 
     - task: GitHubComment@0
-      condition: ${{ variables['has-drift'] }}
+      # condition: ${{ variables['has-drift'] }}
+      condition: succeeded('DetectDriftJob')
       displayName: Post - Has Drift
       inputs:
         gitHubConnection: $(github-connection-name)
