@@ -94,20 +94,20 @@ stages:
   - job: PostCommentJob
     displayName: Post Results to GitHub
     variables:
-      - name: github-repo-name
-        value: Azure-Samples/devops-governance
-      - name: github-connection-name
-        value: Azure-Samples
-      - name: github_connection_name
-        value: Azure-Samples
-      - name: ado-org-name
-        value: julie-msft
-      - name: ado-project-name
-        value: e2e-governance-demo
-      - name: build-id
-        value: $(BuildID) # ${{ variables['Build.BuildId'] }}
-      - name: has-drift
-        value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+    - name: github-repo-name
+      value: Azure-Samples/devops-governance
+    - name: github-connection-name
+      value: Azure-Samples
+    - name: github_connection_name
+      value: Azure-Samples
+    - name: ado-org-name
+      value: julie-msft
+    - name: ado-project-name
+      value: e2e-governance-demo
+    - name: build-id
+      value: $(BuildID) # ${{ variables['Build.BuildId'] }}
+    - name: has-drift
+      value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: has-drift
     #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: tf-plan-output
@@ -117,7 +117,7 @@ stages:
       condition: eq(variables['has-drift'], false)
       displayName: Post - No Drift
       inputs:
-        gitHubConnection: variables['github_connection_name']
+        gitHubConnection: ${{ variables['github_connection_name'] }}
         repositoryName: $(github-repo-name)
         comment: |
           🟢 No configuration drift detected
@@ -126,7 +126,7 @@ stages:
       condition: variables['has-drift']
       displayName: Post - Has Drift
       inputs:
-        gitHubConnection: variables['github_connection_name']
+        gitHubConnection: ${{ variables['github_connection_name'] }}
         repositoryName: $(github-repo-name)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
