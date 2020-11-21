@@ -18,101 +18,112 @@ variables:
   - name: github-connection-name
     value: Azure-Samples
 
-jobs:
-- job: DetectDriftJob
-  displayName: Detect Drift
-  steps:
-  - bash: |
-      terraform init \
-        -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
-        -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
-        -backend-config="key=$TF_STATE_BLOB_FILE" \
-        -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
-    displayName: Terraform - Init
-    env:
-      TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
-      TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
-      TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
-      TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
+  - name: ado-org-name
+    value: julie-msft
 
-  # Run `terraform plan` and preserve exit code and output for downstream steps - but no multi-line var support
-  # - bash: |
-  #     set -o pipefail
-  #     terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt
-  #     STATUS=${PIPESTATUS[@]}
-  #     echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
-  #     [[ $STATUS == "0" ]] && exit 0 || exit 1
+  - name: ado-project-name
+    value: e2e-governance-demo
 
-  - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
-    continueOnError: true
-    displayName: Terraform - Detect configuration drift
-    name: planStep
-    env:
-      ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
-      ARM_CLIENT_ID:              $(kv-arm-client-id)
-      ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
-      ARM_TENANT_ID:              $(kv-arm-tenant-id)
-      AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
-      AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
-      AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
+  - name: build-id
+    value: ${{ variables['Build.BuildId'] }}
 
-  # Multiline variables are not supported in Azure DevOps 😕
-  # - bash: |
-  #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
-  #   displayName: Save terraform plan output
+stages:
+- stage: TFPlanStage
+  displayName: Terraform Plan
+  jobs:
+  - job: DetectDriftJob
+    displayName: Detect Drift
+    steps:
+    - bash: |
+        terraform init \
+          -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
+          -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
+          -backend-config="key=$TF_STATE_BLOB_FILE" \
+          -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
+      displayName: Terraform - Init
+      env:
+        TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
+        TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
+        TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
+        TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
-  # - bash: echo $(tfPlanOutput)
-  #   displayName: debug tf plan output
+    # Run `terraform plan` and preserve exit code and output for downstream steps - but no multi-line var support
+    # - bash: |
+    #     set -o pipefail
+    #     terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt
+    #     STATUS=${PIPESTATUS[@]}
+    #     echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
+    #     [[ $STATUS == "0" ]] && exit 0 || exit 1
 
-- job: PostCommentJob
+    - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
+      displayName: Terraform - Detect configuration drift
+      name: planStep
+      continueOnError: true
+      env:
+        ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
+        ARM_CLIENT_ID:              $(kv-arm-client-id)
+        ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
+        ARM_TENANT_ID:              $(kv-arm-tenant-id)
+        AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
+        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
+        AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
+
+    # # Multiline variables are not supported in Azure DevOps 😕
+    # - bash: |
+    #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
+    #   displayName: Save terraform plan output
+
+    # - bash: echo $(tfPlanOutput)
+    #   displayName: debug tf plan output
+
+- stage: PRCommentStage
   displayName: Post Results to GitHub
-  dependsOn: DetectDriftJob
-  condition: always()
-  variables:
+  dependsOn: TFPlanStage
+  jobs:
+  - job: PostCommentJob
+    displayName: Post Results to GitHub
+    dependsOn: DetectDriftJob
+    # condition: always()
+    variables:
+    - name: has-no-drift
+      value: eq(dependencies.DetectDriftJob.result, 'Succeeded')
+    - name: has-drift
+      value: in(dependencies.DetectDriftJob.result, 'Failed', 'SucceededWithIssues')
+    - name: was-not-run
+      value: in(dependencies.DetectDriftJob.result, 'Canceled', 'Skipped')
     # - name: has-drift
     #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
-
     # - name: tf-plan-output
     #   value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
+    steps:
+    - task: GitHubComment@0
+      condition: $(has-no-drift)
+      displayName: Post - No Drift
+      inputs:
+        gitHubConnection: $(github-connection-name)
+        repositoryName: $(github-repo-name)
+        comment: |
+          🟢 No configuration drift detected
 
-    - name: ado-org-name
-      value: julie-msft
+    - task: GitHubComment@0
+      condition: $(was-not-run)
+      displayName: Post - Was Cancelled
+      inputs:
+        gitHubConnection: $(github-connection-name)
+        repositoryName: $(github-repo-name)
+        comment: |
+          ### ⚠️ &nbsp;Job cancelled or skipped
 
-    - name: ado-project-name
-      value: e2e-governance-demo
+    - task: GitHubComment@0
+      condition: $(has-drift)
+      displayName: Post - Has Drift
+      inputs:
+        gitHubConnection: $(github-connection-name)
+        repositoryName: $(github-repo-name)
+        comment: |
+          ### ⚠️ &nbsp;Configuration Drift Detected
 
-    - name: build-id
-      value: ${{ variables['Build.BuildId'] }}
+          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
+          https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$(build-id)&view=results
 
-  steps:
-  - task: GitHubComment@0
-    condition: eq(dependencies.DetectDriftJob.result, 'Succeeded')
-    displayName: Post - No Drift
-    inputs:
-      gitHubConnection: $(github-connection-name)
-      repositoryName: $(github-repo-name)
-      comment: |
-        🟢 No configuration drift detected
-
-  - task: GitHubComment@0
-    condition: in(dependencies.DetectDriftJob.result, 'Canceled', 'Skipped')
-    displayName: Post - Was Cancelled
-    inputs:
-      gitHubConnection: $(github-connection-name)
-      repositoryName: $(github-repo-name)
-      comment: |
-        ### ⚠️ &nbsp;Job cancelled or skipped
-
-  - task: GitHubComment@0
-    condition: in(dependencies.DetectDriftJob.result, 'Failed', 'SucceededWithIssues')
-    displayName: Post - Has Drift
-    inputs:
-      gitHubConnection: $(github-connection-name)
-      repositoryName: $(github-repo-name)
-      comment: |
-        ### ⚠️ &nbsp;Configuration Drift Detected
-
-        Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
-        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$(build-id)&view=results
-
-        Proceed with caution!
+          Proceed with caution!
