@@ -44,21 +44,10 @@ stages:
         TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
     - bash: |
-        # Remember Exit Code
-        set -o pipefail
-
-        # Run `terraform plan` and save output
         terraform plan \
           -detailed-exitcode \
-          -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
-            | tee plan-output.txt
-
-        # Save Exit Code
-        STATUS=${PIPESTATUS[@]}
-        echo "##vso[task.setvariable variable=tfPlanExit;isOutput=true]$("echo $STATUS)"
-        [[ $STATUS == "0" ]] && exit 0 || exit 1
+          -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
       displayName: Terraform - Detect configuration drift
-      # continueOnError: true  # so we can post result to Pull Request
       name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
@@ -74,10 +63,13 @@ stages:
     #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
     #   displayName: Save terraform plan output
 
-    # - bash: echo $(tfPlanOutput)
-    #   displayName: debug tf plan output
-    - bash: echo $(tfPlanExit)
-      displayName: debug tf plan exit
+    - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
+      condition: succeeded('planStep')
+      displayName: set has_drift to true
+
+      - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
+      condition: succeeded('planStep')
+      displayName: set has_drift to true
 
 
 # Stage: Pull Request Comment
@@ -92,6 +84,14 @@ stages:
     ado-project-name:       e2e-governance-demo
     has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
   jobs:
+  - job: TestOutput
+    steps:
+    - bash: echo "all good"
+      condition: eq(dependencies.TFPlanStage.result,'Succeeded')
+
+    - bash: echo "not working"
+      condition: eq(dependencies.TFPlanStage.result,'Failed')
+
   - job: PostCommentJob
     displayName: Post to GitHub
     steps:
