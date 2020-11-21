@@ -54,12 +54,13 @@ jobs:
       AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
       AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-  - bash: |
-      echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
-    displayName: Save terraform plan output
+  # Multiline variables are not supported in Azure DevOps 😕
+  # - bash: |
+  #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
+  #   displayName: Save terraform plan output
 
-  - bash: echo $(tfPlanOutput)
-    displayName: debug tf plan output
+  # - bash: echo $(tfPlanOutput)
+  #   displayName: debug tf plan output
 
 - job: PostCommentJob
   displayName: Post Results to GitHub
@@ -67,8 +68,16 @@ jobs:
   variables:
     - name: has-drift
       value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+
     - name: tf-plan-output
       value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
+
+    - name: ado-org-name
+      value: julie-msft
+
+    - name: ado-project-name
+      value: e2e-governance-demo
+
   steps:
   - task: GitHubComment@0
     condition: eq(variables['has-drift'], false)
@@ -86,10 +95,10 @@ jobs:
       gitHubConnection: $(github-connection-name)
       repositoryName: $(github-repo-name)
       comment: |
-        ⚠️ Configuration drift detected. Approving this Pull Request may result in destructive changes to your Azure resources.
+        ⚠️ **Configuration drift detected!** ⚠️
+        Approving this Pull Request may result in destructive changes to your Azure resources. Proceed with caution!
 
-        Proceed with caution!
+        Please review the `terraform plan` configuration diff at Azure Pipelines:
+        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$(BuildID)&view=results
 
-        ```bash
-        ${{ variables['tf-plan-output'] }}
-        ```
+        Sorry, the [GitHubCommentV0 task](https://github.com/microsoft/azure-pipelines-tasks/blob/master/Tasks/GitHubCommentV0/task.json) only takes strings and Azure DevOps does not support multistring variables 🤷‍♀️
