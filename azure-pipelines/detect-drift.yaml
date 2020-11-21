@@ -67,7 +67,7 @@ stages:
       condition: succeeded('planStep')
       displayName: set has_drift to true
 
-      - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
+    - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
       condition: succeeded('planStep')
       displayName: set has_drift to true
 
