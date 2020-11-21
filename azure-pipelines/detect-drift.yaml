@@ -63,12 +63,12 @@ stages:
     #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
     #   displayName: Save terraform plan output
 
-    - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
-      condition: succeeded('planStep')
-      displayName: set has_drift to true
+    - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]false"
+      condition: succeeded()
+      displayName: set has_drift to false
 
     - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
-      condition: succeeded('planStep')
+      condition: failed()
       displayName: set has_drift to true
 
 
