@@ -55,9 +55,10 @@ stages:
     #     echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
     #     [[ $STATUS == "0" ]] && exit 0 || exit 1
 
-    - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
+    # - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
+    - bash: exit 1 # fake for now
       displayName: Terraform - Detect configuration drift
-      name: planStep
+      # name: planStep
       continueOnError: true
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
@@ -81,11 +82,11 @@ stages:
   dependsOn: TFPlanStage
   variables:
   - name: has-no-drift
-    value: eq($[ dependencies.TFPlanStage.DetectDriftJob.result ], 'Succeeded')
+    value: eq($[ dependencies.TFPlanStage.result ], 'Succeeded')
   - name: has-drift
-    value: in($[ dependencies.TFPlanStage.DetectDriftJob.result ], 'Failed', 'SucceededWithIssues')
+    value: in($[ dependencies.TFPlanStage.result ], 'Failed', 'SucceededWithIssues')
   - name: was-not-run
-    value: in($[dependencies.TFPlanStage.DetectDriftJob.result ], 'Canceled', 'Skipped')
+    value: in($[ dependencies.TFPlanStage.result ], 'Canceled', 'Skipped')
   jobs:
   - job: PostCommentJob
     displayName: Post Results to GitHub
