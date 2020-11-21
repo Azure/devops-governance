@@ -118,7 +118,7 @@ stages:
 
     - task: GitHubComment@0
       # condition: ${{ variables['has-drift'] }}
-      condition: succeeded('DetectDriftJob')
+      condition: failed('DetectDriftJob')
       displayName: Post - Has Drift
       inputs:
         gitHubConnection: $(github-connection-name)
