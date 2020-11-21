@@ -81,11 +81,11 @@ stages:
   dependsOn: TFPlanStage
   variables:
   - name: has-no-drift
-    value: eq(dependencies.TFPlanStage.DetectDriftJob.result, 'Succeeded')
+    value: eq($[ dependencies.TFPlanStage.DetectDriftJob.result ], 'Succeeded')
   - name: has-drift
-    value: in(dependencies.TFPlanStage.DetectDriftJob.result, 'Failed', 'SucceededWithIssues')
+    value: in($[ dependencies.TFPlanStage.DetectDriftJob.result ], 'Failed', 'SucceededWithIssues')
   - name: was-not-run
-    value: in(dependencies.TFPlanStage.DetectDriftJob.result, 'Canceled', 'Skipped')
+    value: in($[dependencies.TFPlanStage.DetectDriftJob.result ], 'Canceled', 'Skipped')
   jobs:
   - job: PostCommentJob
     displayName: Post Results to GitHub
