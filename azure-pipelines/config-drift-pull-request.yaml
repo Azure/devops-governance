@@ -102,10 +102,10 @@ jobs:
     inputs:
       gitHubConnection: $(github-connection-name)
       repositoryName: $(github-repo-name)
-      # comment: |
-      #   ### ⚠️ &nbsp;**CONFIGURATION DRIFT DETECTED** ⚠️
+      comment: |
+        ### ⚠️ &nbsp;Configuration Drift Detected
 
-      #   Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
-      #   https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$[ variables['Build.BuildId'] ]&view=results
+        Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
+        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$(build-id)&view=results
 
-      #   Proceed with caution!
+        Proceed with caution!
