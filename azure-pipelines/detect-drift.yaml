@@ -20,6 +20,15 @@ schedules:
 variables:
   - group: e2e-gov-demo-kv
 
+  - name: github-repo-name
+    value: Azure-Samples/devops-governance
+
+  - name: github-connection-name
+    value: Azure-Samples
+
+  - name: is-pull-request
+    value: ${{ eq(variables['Build.Reason'], 'PullRequest') }}
+
 steps:
 - bash: terraform version
   displayName: Terraform - Vsersion
@@ -52,3 +61,13 @@ steps:
     AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
     AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
     AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
+
+- task: GitHubComment@0
+  condition: and(failed(), ${{ variables['is-pull-request'] }})
+  displayName: Comment on GitHub PR
+  inputs:
+    gitHubConnection: $(github-connection-name) # must be PAT connection
+    repositoryName: $(github-repo-name)
+    # id: # PR Id. Leave empty and AzDO will figure it out
+    comment: |
+      It failed (testing PR comment).
