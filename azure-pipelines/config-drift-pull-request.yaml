@@ -80,7 +80,7 @@ stages:
 - stage: PRCommentStage
   displayName: Post Results to GitHub
   # dependsOn: TFPlanStage
-  variables:
+  # variables:
   # - name: has-no-drift
   #   value: eq($[ dependencies.TFPlanStage.result ], 'Succeeded')
   # - name: has-drift
