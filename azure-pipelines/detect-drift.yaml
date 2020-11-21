@@ -87,10 +87,12 @@ stages:
   - job: TestOutput
     steps:
     - bash: echo "all good"
-      condition: eq(dependencies.TFPlanStage.result,'Succeeded')
+      condition: eq(variables['has_drift'], 'false')
+      displayName: no drift
 
     - bash: echo "not working"
-      condition: eq(dependencies.TFPlanStage.result,'Failed')
+      condition: eq(variables['has_drift'], 'true')
+      displayName: got drift
 
   - job: PostCommentJob
     displayName: Post to GitHub
