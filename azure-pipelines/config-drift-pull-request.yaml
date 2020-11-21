@@ -61,7 +61,6 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-
     # # Multiline variables are not supported in Azure DevOps 😕
     # - bash: |
     #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
@@ -69,7 +68,6 @@ stages:
 
     # - bash: echo $(tfPlanOutput)
     #   displayName: debug tf plan output
-
 
 
 # Stage: Pull Request Comment
@@ -110,8 +108,8 @@ stages:
       condition: eq(variables['has-drift'], false)
       displayName: Post - No Drift
       inputs:
-        # gitHubConnection: ${{ variables['github-connection-name'] }}
-        gitHubConnection: $(github-connection-name)
+        gitHubConnection: $[ variables['github-connection-name'] ]
+        # gitHubConnection: $(github-connection-name)
         repositoryName: $(github-repo-name)
         comment: |
           🟢 No configuration drift detected
@@ -120,8 +118,8 @@ stages:
       condition: variables['has-drift']
       displayName: Post - Has Drift
       inputs:
-        # gitHubConnection: ${{ variables['github-connection-name'] }}
-        gitHubConnection: $(github-connection-name)
+        gitHubConnection: $[ variables['github-connection-name'] ]
+        # gitHubConnection: $(github-connection-name)
         repositoryName: $(github-repo-name)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
