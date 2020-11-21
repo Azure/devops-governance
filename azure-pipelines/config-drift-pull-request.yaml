@@ -35,13 +35,15 @@ jobs:
       TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
       TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
-  # Run `terraform plan` and preserve exit code and output for downstream steps
-  - bash: |
-      set -o pipefail
-      terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt
-      STATUS=${PIPESTATUS[@]}
-      echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
-      [[ $STATUS == "0" ]] && exit 0 || exit 1
+  # Run `terraform plan` and preserve exit code and output for downstream steps - but no multi-line var support
+  # - bash: |
+  #     set -o pipefail
+  #     terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt
+  #     STATUS=${PIPESTATUS[@]}
+  #     echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
+  #     [[ $STATUS == "0" ]] && exit 0 || exit 1
+
+  - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
     continueOnError: true
     displayName: Terraform - Detect configuration drift
     name: planStep
@@ -95,10 +97,9 @@ jobs:
       gitHubConnection: $(github-connection-name)
       repositoryName: $(github-repo-name)
       comment: |
-        ⚠️ **Configuration drift detected!** ⚠️
-        Approving this Pull Request may result in destructive changes to your Azure resources. Proceed with caution!
+        ### ⚠️ &nbsp;**CONFIGURATION DRIFT DETECTED** ⚠️
 
-        Please review the `terraform plan` configuration diff at Azure Pipelines:
-        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=$(BuildID)&view=results
+        Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines:
+        https://dev.azure.com/$(ado-org-name)/$(ado-project-name)/_build/results?buildId=${{ variables['Build.BuildId'] }}&view=results
 
-        Sorry, the [GitHubCommentV0 task](https://github.com/microsoft/azure-pipelines-tasks/blob/master/Tasks/GitHubCommentV0/task.json) only takes strings and Azure DevOps does not support multistring variables 🤷‍♀️
+        Proceed with caution!
