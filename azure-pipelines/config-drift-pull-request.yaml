@@ -69,8 +69,8 @@ jobs:
     - name: has-drift
       value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
 
-    - name: tf-plan-output
-      value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
+    # - name: tf-plan-output
+    #   value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
 
     - name: ado-org-name
       value: julie-msft
