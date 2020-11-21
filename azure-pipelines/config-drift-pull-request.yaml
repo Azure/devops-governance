@@ -97,7 +97,7 @@ stages:
     #   value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
     steps:
     - task: GitHubComment@0
-      condition: $[ variables['has-no-drift'] ]
+      condition: ${{ variables['has-no-drift'] }}
       displayName: Post - No Drift
       inputs:
         gitHubConnection: $(github-connection-name)
@@ -106,7 +106,7 @@ stages:
           🟢 No configuration drift detected
 
     - task: GitHubComment@0
-      condition: $[ variables['was-not-run'] ]
+      condition: ${{ variables['was-not-run'] }}
       displayName: Post - Was Cancelled
       inputs:
         gitHubConnection: $(github-connection-name)
@@ -115,7 +115,7 @@ stages:
           ### ⚠️ &nbsp;Job cancelled or skipped
 
     - task: GitHubComment@0
-      condition: $[ variables['has-drift'] ]
+      condition: ${{ variables['has-drift'] }}
       displayName: Post - Has Drift
       inputs:
         gitHubConnection: $(github-connection-name)
