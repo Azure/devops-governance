@@ -98,6 +98,8 @@ stages:
         value: Azure-Samples/devops-governance
       - name: github-connection-name
         value: Azure-Samples
+      - name: github_connection_name
+        value: Azure-Samples
       - name: ado-org-name
         value: julie-msft
       - name: ado-project-name
@@ -115,7 +117,7 @@ stages:
       condition: eq(variables['has-drift'], false)
       displayName: Post - No Drift
       inputs:
-        gitHubConnection: $(github-connection-name)
+        gitHubConnection: $(github_connection_name)
         repositoryName: $(github-repo-name)
         comment: |
           🟢 No configuration drift detected
@@ -124,7 +126,7 @@ stages:
       condition: variables['has-drift']
       displayName: Post - Has Drift
       inputs:
-        gitHubConnection: $(github-connection-name)
+        gitHubConnection: $(github_connection_name)
         repositoryName: $(github-repo-name)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
