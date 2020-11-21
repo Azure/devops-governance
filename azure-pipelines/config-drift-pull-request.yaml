@@ -108,8 +108,7 @@ stages:
       condition: eq(variables['has-drift'], false)
       displayName: Post - No Drift
       inputs:
-        gitHubConnection: $[ variables['github-connection-name'] ]
-        # gitHubConnection: $(github-connection-name)
+        gitHubConnection: ${{ variables['github-connection-name'] }}
         repositoryName: $(github-repo-name)
         comment: |
           🟢 No configuration drift detected
@@ -118,12 +117,11 @@ stages:
       condition: variables['has-drift']
       displayName: Post - Has Drift
       inputs:
-        gitHubConnection: $[ variables['github-connection-name'] ]
-        # gitHubConnection: $(github-connection-name)
+        gitHubConnection: ${{ variables['github-connection-name'] }}
         repositoryName: $(github-repo-name)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
 
-          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines.
+          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines Build Result Page.
 
           Proceed with caution!
