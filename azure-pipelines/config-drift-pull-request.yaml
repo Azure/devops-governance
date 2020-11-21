@@ -81,18 +81,6 @@ stages:
     ado-org-name:           julie-msft
     ado-project-name:       e2e-governance-demo
     has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
-  # variables:
-  # - name:  github-repo-name
-  #   value: Azure-Samples/devops-governance
-  # - name:  github-connection-name
-  #   value: Azure-Samples
-  # - name:  ado-org-name
-  #   value: julie-msft
-  # - name:  ado-project-name
-  #   value: e2e-governance-demo
-  # - name:  has-drift
-  #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
-
   jobs:
   - job: PostCommentJob
     displayName: Post to GitHub
