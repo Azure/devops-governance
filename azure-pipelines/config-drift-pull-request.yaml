@@ -94,12 +94,18 @@ stages:
   - job: PostCommentJob
     displayName: Post Results to GitHub
     variables:
-      github-repo-name:       Azure-Samples/devops-governance
-      github-connection-name: Azure-Samples
-      ado-org-name:           julie-msft
-      ado-project-name:       e2e-governance-demo
-      build-id:               $(BuildID) # ${{ variables['Build.BuildId'] }}
-      has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+      - name: github-repo-name
+        value: Azure-Samples/devops-governance
+      - name: github-connection-name
+        value: Azure-Samples
+      - name: ado-org-name
+        value: julie-msft
+      - name: ado-project-name
+        value: e2e-governance-demo
+      - name: build-id
+        value: $(BuildID) # ${{ variables['Build.BuildId'] }}
+      - name: has-driftt
+        value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: has-drift
     #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: tf-plan-output
