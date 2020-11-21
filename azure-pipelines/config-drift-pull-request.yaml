@@ -92,22 +92,35 @@ stages:
   #   value: in($[ dependencies.TFPlanStage.result ], 'Failed', 'SucceededWithIssues')
   # - name: was-not-run
   #   value: in($[ dependencies.TFPlanStage.result ], 'Canceled', 'Skipped')
+  variables:
+  - name: github-repo-name
+    value: Azure-Samples/devops-governance
+  - name: github-connection-name
+    value: Azure-Samples
+  - name: ado-org-name
+    value: julie-msft
+  - name: ado-project-name
+    value: e2e-governance-demo
+  - name: build-id
+    value: ${{ variables['Build.BuildId'] }}
+  - name: has-drift
+    value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
   jobs:
   - job: PostCommentJob
     displayName: Add Comment to Pull Request
-    variables:
-    - name: github-repo-name
-      value: Azure-Samples/devops-governance
-    - name: github-connection-name
-      value: Azure-Samples
-    - name: ado-org-name
-      value: julie-msft
-    - name: ado-project-name
-      value: e2e-governance-demo
-    - name: build-id
-      value: ${{ variables['Build.BuildId'] }}
-    - name: has-drift
-      value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+    # variables:
+    # - name: github-repo-name
+    #   value: Azure-Samples/devops-governance
+    # - name: github-connection-name
+    #   value: Azure-Samples
+    # - name: ado-org-name
+    #   value: julie-msft
+    # - name: ado-project-name
+    #   value: e2e-governance-demo
+    # - name: build-id
+    #   value: ${{ variables['Build.BuildId'] }}
+    # - name: has-drift
+    #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: has-drift
     #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: tf-plan-output
