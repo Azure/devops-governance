@@ -20,10 +20,10 @@ variables:
 
 stages:
 - stage: ci_stage
-  displayName: Terraform CI (validate and lint)
+  displayName: CI Stage
   jobs:
   - job: ci_job
-    displayName: Validate and Lint
+    displayName: Terraform Validate and Lint
     steps:
     - bash: terraform version
       displayName: terraform version
@@ -37,10 +37,10 @@ stages:
       displayName: terraform validate and Lint
 
 - stage: cd_stage
-  displayName: Terraform Deploy
+  displayName: CD Stage
   jobs:
   - job: deploy
-    displayName: Deploy
+    displayName: Terraform Plan and Apply
     steps:
     - bash: |
         terraform init \
