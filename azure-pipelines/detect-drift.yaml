@@ -71,6 +71,17 @@ stages:
       condition: failed()
       displayName: set has_drift to true
 
+    - bash: echo "##vso[task.setvariable variable=got_drift;isOutput=true]$GOTDRIFT"
+      variables:
+        ${{ if succeeded() }}:
+          GOTDRIFT: false
+        ${{ if failed() }}:
+          GOTDRIFT: true
+      displayName: set got_drift
+
+    - bash: echo got drift - $GOT_DRIFT
+      displayName: echo got_drift
+
 
 # Stage: Pull Request Comment
 # ---------------------------
@@ -82,16 +93,16 @@ stages:
     github-connection-name: Azure-Samples
     ado-org-name:           julie-msft
     ado-project-name:       e2e-governance-demo
-    has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+    has-drift:              $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['ProduceVar.exitCode'] ]
   jobs:
   - job: TestOutput
     steps:
     - bash: echo "all good"
-      condition: eq(variables['has_drift'], 'false')
+      condition: eq(variables['has-drift'], 'false')
       displayName: no drift
 
     - bash: echo "not working"
-      condition: eq(variables['has_drift'], 'true')
+      condition: eq(variables['has-drift'], 'true')
       displayName: got drift
 
   - job: PostCommentJob
