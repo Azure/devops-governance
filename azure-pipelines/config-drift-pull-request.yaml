@@ -12,22 +12,10 @@ pr:
 variables:
   - group: e2e-gov-demo-kv
 
-  - name: github-repo-name
-    value: Azure-Samples/devops-governance
-
-  - name: github-connection-name
-    value: Azure-Samples
-
-  - name: ado-org-name
-    value: julie-msft
-
-  - name: ado-project-name
-    value: e2e-governance-demo
-
-  - name: build-id
-    value: ${{ variables['Build.BuildId'] }}
-
 stages:
+
+# Stage: Terraform Plan
+# ---------------------
 - stage: TFPlanStage
   displayName: Terraform Plan
   jobs:
@@ -47,19 +35,23 @@ stages:
         TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
         TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
-    # Run `terraform plan` and preserve exit code and output for downstream steps - but no multi-line var support
-    # - bash: |
-    #     set -o pipefail
-    #     terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt
-    #     STATUS=${PIPESTATUS[@]}
-    #     echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
-    #     [[ $STATUS == "0" ]] && exit 0 || exit 1
+    - bash: |
+        # Remember Exit Code
+        set -o pipefail
 
-    # - bash: terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
-    - bash: exit 1 # fake for now
+        # Run `terraform plan` and save output
+        terraform plan \
+          -detailed-exitcode \
+          -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
+            | tee plan-output.txt
+
+        # Save Exit Code
+        STATUS=${PIPESTATUS[@]}
+        echo "##vso[task.setvariable variable=tfPlanExit]$("echo $STATUS")"
+        [[ $STATUS == "0" ]] && exit 0 || exit 1
       displayName: Terraform - Detect configuration drift
-      # name: planStep
-      continueOnError: true
+      continueOnError: true  # so we can post result to Pull Request
+      name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
         ARM_CLIENT_ID:              $(kv-arm-client-id)
@@ -69,6 +61,9 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
+    - bash: echo "Exit Code - $(tfPlanExit)"
+      displayName: Confirm Exit Code
+
     # # Multiline variables are not supported in Azure DevOps 😕
     # - bash: |
     #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
@@ -77,10 +72,18 @@ stages:
     # - bash: echo $(tfPlanOutput)
     #   displayName: debug tf plan output
 
+# Stage: Pull Request Comment
+# ---------------------------
+
 - stage: PRCommentStage
   displayName: Post Results to GitHub
-  # dependsOn: TFPlanStage
-  # variables:
+  variables:
+    github-repo-name:       Azure-Samples/devops-governance
+    github-connection-name: Azure-Samples
+    ado-org-name:           julie-msft
+    ado-project-name:       e2e-governance-demo
+    build-id:               $(BuildID) # ${{ variables['Build.BuildId'] }}
+    has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
   # - name: has-no-drift
   #   value: eq($[ dependencies.TFPlanStage.result ], 'Succeeded')
   # - name: has-drift
@@ -90,16 +93,13 @@ stages:
   jobs:
   - job: PostCommentJob
     displayName: Post Results to GitHub
-    # dependsOn: DetectDriftJob
-    # condition: always()
     # - name: has-drift
     #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
     # - name: tf-plan-output
     #   value: ${{ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanOutput'] }}
     steps:
     - task: GitHubComment@0
-      # condition: ${{ variables['has-no-drift'] }}
-      condition: succeeded('DetectDriftJob')
+      condition: eq(variables['has-drift'], false)
       displayName: Post - No Drift
       inputs:
         gitHubConnection: $(github-connection-name)
@@ -107,18 +107,8 @@ stages:
         comment: |
           🟢 No configuration drift detected
 
-    # - task: GitHubComment@0
-    #   condition: ${{ variables['was-not-run'] }}
-    #   displayName: Post - Was Cancelled
-    #   inputs:
-    #     gitHubConnection: $(github-connection-name)
-    #     repositoryName: $(github-repo-name)
-    #     comment: |
-    #       ### ⚠️ &nbsp;Job cancelled or skipped
-
     - task: GitHubComment@0
-      # condition: ${{ variables['has-drift'] }}
-      condition: failed('DetectDriftJob')
+      condition: variables['has-drift']
       displayName: Post - Has Drift
       inputs:
         gitHubConnection: $(github-connection-name)
