@@ -75,30 +75,23 @@ stages:
 - stage: PRCommentStage
   displayName: Pull Request Comment
   condition: eq(variables['Build.Reason'], 'PullRequest')
-  # variables:
-  #   github-repo-name:       Azure-Samples/devops-governance
-  #   github-connection-name: Azure-Samples
-  #   ado-org-name:           julie-msft
-  #   ado-project-name:       e2e-governance-demo
-  #   build-id:               $(BuildID) # ${{ variables['Build.BuildId'] }}
-  #   has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
-  # - name: has-no-drift
-  #   value: eq($[ dependencies.TFPlanStage.result ], 'Succeeded')
-  # - name: has-drift
-  #   value: in($[ dependencies.TFPlanStage.result ], 'Failed', 'SucceededWithIssues')
-  # - name: was-not-run
-  #   value: in($[ dependencies.TFPlanStage.result ], 'Canceled', 'Skipped')
   variables:
-  - name:  github-repo-name
-    value: Azure-Samples/devops-governance
-  - name:  github-connection-name
-    value: Azure-Samples
-  - name:  ado-org-name
-    value: julie-msft
-  - name:  ado-project-name
-    value: e2e-governance-demo
-  - name:  has-drift
-    value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+    github-repo-name:       Azure-Samples/devops-governance
+    github-connection-name: Azure-Samples
+    ado-org-name:           julie-msft
+    ado-project-name:       e2e-governance-demo
+    has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+  # variables:
+  # - name:  github-repo-name
+  #   value: Azure-Samples/devops-governance
+  # - name:  github-connection-name
+  #   value: Azure-Samples
+  # - name:  ado-org-name
+  #   value: julie-msft
+  # - name:  ado-project-name
+  #   value: e2e-governance-demo
+  # - name:  has-drift
+  #   value: ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
 
   jobs:
   - job: PostCommentJob
@@ -122,6 +115,6 @@ stages:
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
 
-          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` configuration diff at Azure Pipelines Build Result Page.
+          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
 
           Proceed with caution!
