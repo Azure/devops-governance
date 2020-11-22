@@ -80,10 +80,10 @@ stages:
 
     # Multiline variables are not supported in Azure DevOps 😕
     - bash: |
-        oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
-        echo $oneliner
+        # oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
+        # echo $oneliner
         echo "====="
-        echo "##vso[task.setvariable variable=planOutput;isOutput=true]DEBUG - 1st line, LOTS AND \n2nd line LOTS OF TEXT…"
+        echo "##vso[task.setvariable variable=planOutput;isOutput=true]DEBUG - 1st line, LOTS AND\\n2nd line LOTS OF TEXT…"
       displayName: Save terraform plan output (try)
       name: getPlanOutputStep
       condition: always()
