@@ -119,6 +119,8 @@ stages:
         comment: |
           ### 🟢 &nbsp;No configuration drift detected
 
+          Source Version: ${{ Build.SourceVersion }}
+
     # Step - post, Drift detected
     - task: GitHubComment@0
       condition: eq(variables['exitCode'], 'non-zero')
@@ -128,6 +130,8 @@ stages:
         repositoryName: $(githubRepoName)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
+
+          Source Version: ${{ Build.SourceVersion }}
 
           Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
 
