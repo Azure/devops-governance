@@ -89,22 +89,23 @@ stages:
     - publish: ./plan-output.txt
       artifact: terraformPlanOutput
       displayName: Publish 'terraform plan' output
+      condition: always()
 
 
 # Stage: Pull Request Comment
 # ---------------------------
-- stage: PRCommentStage
-  displayName: Pull Request Comment
+- stage: pullRequestCommentStage
+  displayName: Drift Status
   condition: and(succeededOrFailed(), eq(variables['Build.Reason'], 'PullRequest'))
   variables:
     githubRepoName:       Azure-Samples/devops-governance
-    githuhConnectionName: Azure-Samples
+    githubConnectionName: Azure-Samples
     adoOrgName:           julie-msft
     adoProjectName:       e2e-governance-demo
     exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
     planOutput:           $[ stageDependencies.terraformStage.terraformJob.outputs['outputPlanStep.planOutput'] ]
   jobs:
-  - job: PostCommentJob
+  - job: postCommentJob
     displayName: Post to GitHub
     steps:
 
