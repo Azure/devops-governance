@@ -53,14 +53,13 @@ stages:
         # Run `terraform plan` and save output (used later for posting to GitHub)
         if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
             | tee plan-output.txt \
-            echo "========= Pipeline - Drift Detection =========" \
             exit ${PIPESTATUS[0]}
         then
-          echo "🟢 No configuration drift detected"
+          echo "======= 🟢 No configuration drift detected ======="
           echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
         else
           tf_exit_code=$?
-          echo "⚠️  Configuration drift detected"
+          echo "======= ⚠️  Configuration drift detected ======="
           echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
           exit $tf_exit_code
         fi
@@ -82,7 +81,9 @@ stages:
     # Multiline variables are not supported in Azure DevOps 😕
     - bash: |
         oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
-        echo "##vso[task.setvariable variable=planOutput]$oneliner"
+        echo $oneliner
+        echo "====="
+        echo "##vso[task.setvariable variable=planOutput]DEBUG - 1st line, LOTS AND \n2nd line LOTS OF TEXT…"
       displayName: Save terraform plan output (try)
       name: getPlanOutputStep
       condition: always()
