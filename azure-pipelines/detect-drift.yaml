@@ -116,7 +116,7 @@ stages:
   - job: TestOutput
     steps:
     # Does this work?
-    - bash: echo "$(planOutput)"
+    - bash: echo $(planOutput)
       displayName: Does this work?
 
     - bash: echo "all good"
