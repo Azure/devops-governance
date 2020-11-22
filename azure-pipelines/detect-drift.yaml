@@ -146,7 +146,6 @@ stages:
       displayName: Download 'terraform plan' output
 
     - bash: |
-        ls -oa
-        la terraformPlanOutput/
-        # cat ./terraformPlanOutput/plan-output.txt
+        ls $(Pipeline.Workspace)
+        cat $(Pipeline.Workspace)/{artifact}/plan-output.txt
       displayName: output download file
