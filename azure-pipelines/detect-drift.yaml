@@ -55,7 +55,7 @@ stages:
 
 
         # debug tf plan command, no tee ;-(
-        if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID; then
+        if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt; exit ${PIPESTATUS[0]} ; then
           echo "😭 Zero exit code, but it should be 2 based on current state file"
         else
           echo $?
