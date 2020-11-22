@@ -74,7 +74,6 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-
     # Step - pass `terraform plan` output to downstream jobs
     - publish: ./plan-output.txt
       artifact: terraformPlanOutput
@@ -110,7 +109,7 @@ stages:
         comment: |
           ### 🟢 &nbsp;No configuration drift detected
 
-          Source Version: ${{ Build.SourceVersion }}
+          Source Version: $(Build.SourceVersion)
 
     # Step - post, Drift detected
     - task: GitHubComment@0
@@ -122,7 +121,7 @@ stages:
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
 
-          Source Version: ${{ Build.SourceVersion }}
+          Source Version: $(Build.SourceVersion)
 
           Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
 
