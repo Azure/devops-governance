@@ -30,6 +30,8 @@ stages:
   - job: DetectDriftJob
     displayName: Terraform Plan
     steps:
+
+    # Step - terraform init
     - bash: |
         terraform init \
           -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
@@ -43,20 +45,27 @@ stages:
         TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
         TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
+    # Step - terraform plan
     - bash: |
         # Remember Exit Code
-        set -o pipefail
+        set -uo pipefail
 
-        # Run `terraform plan` and save output
+        # Run `terraform plan` and save output (used later for posting to GitHub)
         terraform plan \
           -detailed-exitcode \
-          -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
+          -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
+            | tee plan-output.txt
 
-        # Save Exit Code
-        STATUS=${PIPESTATUS[@]}
-        echo "##vso[task.setvariable variable=exitCode;isOutput=true]$("echo $STATUS")"
-        echo status: $STATUS
-        if [[ $STATUS == "0" ]]; then exit 0; else exit 1; fi
+        # Save Exit Code from first command before pipe
+        export TF_PLAN_EXIT_CODE=${PIPESTATUS[0]}
+
+        if [[ "$TF_PLAN_EXIT_CODE" == "0" ]]; then
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
+          exit 0
+        else
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
+          exit 1
+        fi
       displayName: Terraform - Detect configuration drift
       name: planStep
       env:
@@ -106,11 +115,11 @@ stages:
       displayName: echo exit code
 
     - bash: echo "all good"
-      condition: eq(variables['exit-code'], '0')
+      condition: eq(variables['exit-code'], 'zero')
       displayName: no drift
 
     - bash: echo "not working"
-      condition: eq(variables['exit-code'], '1')
+      condition: eq(variables['exit-code'], 'non-zero')
       displayName: got drift
 
   # - job: PostCommentJob
