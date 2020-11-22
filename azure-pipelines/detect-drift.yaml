@@ -75,17 +75,7 @@ stages:
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
 
-    # Step - work in progress
-    # Multiline variables are not supported in Azure DevOps 😕
-    - bash: |
-        oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
-        echo $oneliner
-        echo "====="
-        echo "##vso[task.setvariable variable=planOutput;isOutput=true]$(echo $oneliner)"
-      displayName: Save plan output (wip)
-      name: outputPlanStep
-      condition: always()
-
+    # Step - pass `terraform plan` output to downstream jobs
     - publish: ./plan-output.txt
       artifact: terraformPlanOutput
       displayName: Publish 'terraform plan' output
@@ -103,7 +93,8 @@ stages:
     adoOrgName:           julie-msft
     adoProjectName:       e2e-governance-demo
     exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
-    planOutput:           $[ stageDependencies.terraformStage.terraformJob.outputs['outputPlanStep.planOutput'] ]
+    artifactName:         terraformPlanOutput
+    # planOutput:           $[ stageDependencies.terraformStage.terraformJob.outputs['outputPlanStep.planOutput'] ]
   jobs:
   - job: postCommentJob
     displayName: Post to GitHub
@@ -137,19 +128,35 @@ stages:
 
           Proceed with caution!
 
-    # Step - work in progress
-    # We can pass output to downstream stage/job.
-    # But we lose newlines, making output useless for markdown.
-    # Todo: create own task that reads comment contents from a file.
-    - bash: echo $(planOutput)
-      displayName: Debug - plan output
+  # Debugging - Work in progress
 
+  - job: debugOutput
+    displayName: Debug Output
+    steps:
     - download: current  # current pipeline
-      artifact: terraformPlanOutput
+      artifact: $(artifactName)
       patterns: '*'
       displayName: Download 'terraform plan' output
 
     - bash: |
         ls $(Pipeline.Workspace)
-        cat $(Pipeline.Workspace)/terraformPlanOutput/plan-output.txt
+        cat $(Pipeline.Workspace)/$(artifactName)/plan-output.txt
       displayName: output download file
+
+    # Step - work in progress
+    # We can pass output to downstream stage/job.
+    # But we lose newlines, making output useless for markdown.
+    # Todo: create own task that reads comment contents from a file.
+    # - bash: echo $(planOutput)
+    #   displayName: Debug - plan output
+
+    # Step - work in progress
+    # Multiline variables are not supported in Azure DevOps 😕
+    # - bash: |
+    #     oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
+    #     echo $oneliner
+    #     echo "====="
+    #     echo "##vso[task.setvariable variable=planOutput;isOutput=true]$(echo $oneliner)"
+    #   displayName: Save plan output (wip)
+    #   name: outputPlanStep
+    #   condition: always()
