@@ -117,7 +117,7 @@ stages:
         gitHubConnection: ${{ variables.githubConnectionName }}
         repositoryName: $(githubRepoName)
         comment: |
-          🟢 No configuration drift detected
+          ### 🟢 &nbsp;No configuration drift detected
 
     # Step - post, Drift detected
     - task: GitHubComment@0
@@ -147,5 +147,5 @@ stages:
 
     - bash: |
         ls $(Pipeline.Workspace)
-        cat $(Pipeline.Workspace)/{artifact}/plan-output.txt
+        cat $(Pipeline.Workspace)/terraformPlanOutput/plan-output.txt
       displayName: output download file
