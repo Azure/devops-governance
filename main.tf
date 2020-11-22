@@ -106,7 +106,7 @@ module "workspace" {
   source               = "./modules/azure-resources"
   name                 = "${each.value.team}-${each.value.env}-${local.suffix}"
   team_group_id        = azuread_group.groups[each.value.team].id
-  admin_group_id       = azuread_group.groups[each.value.team].id
+  admin_group_id       = azuread_group.groups["${each.value.team}_admins"].id
   superadmins_group_id = var.superadmins_aad_object_id
 }
 
