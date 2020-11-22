@@ -51,9 +51,11 @@ stages:
         set -uo pipefail
 
         # Run `terraform plan` and save output (used later for posting to GitHub)
-        terraform plan \
-          -detailed-exitcode \
-          -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
+        export STRANGE=$( terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee pipeline-output.txt; exit ${PIPESTATUS[0]} )
+
+        echo $?
+        echo "---"
+        echo $STRANGE
 
         # Save Exit Code from first command before pipe
         # try index 1 (but should be zero?)
