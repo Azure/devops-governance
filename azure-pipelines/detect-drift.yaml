@@ -106,20 +106,20 @@ stages:
 
     # Step - post, No Drift
     - task: GitHubComment@0
-      condition: eq(variables['exit-code'], 'zero')
+      condition: eq(variables['exitCode'], 'zero')
       displayName: Post - No Drift
       inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
+        gitHubConnection: $(githubConnectionName)
         repositoryName: $(githubRepoName)
         comment: |
           🟢 No configuration drift detected
 
     # Step - post, Drift detected
     - task: GitHubComment@0
-      condition: eq(variables['exit-code'], 'non-zero')
+      condition: eq(variables['exitCode'], 'non-zero')
       displayName: Post - Has Drift
       inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
+        gitHubConnection: $(githubConnectionName)
         repositoryName: $(githubRepoName)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
