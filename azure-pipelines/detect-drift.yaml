@@ -109,7 +109,7 @@ stages:
       condition: eq(variables['exitCode'], 'zero')
       displayName: Post - No Drift
       inputs:
-        gitHubConnection: $(githubConnectionName)
+        gitHubConnection: ${{ variables.githubConnectionName }}
         repositoryName: $(githubRepoName)
         comment: |
           🟢 No configuration drift detected
@@ -119,7 +119,7 @@ stages:
       condition: eq(variables['exitCode'], 'non-zero')
       displayName: Post - Has Drift
       inputs:
-        gitHubConnection: $(githubConnectionName)
+        gitHubConnection: ${{ variables.githubConnectionName }}
         repositoryName: $(githubRepoName)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
