@@ -60,7 +60,7 @@ stages:
         # try index 1 (but should be zero?)
         echo "============== Debug Pipeline =============="
         echo "All pipestatus(s):"
-        echo "${PIPESTATUS[*]}"
+        echo "${PIPESTATUS[@]}"
 
         # export TF_PLAN_EXIT_CODE=${PIPESTATUS[1]}
         # echo "What is pipestatus (expect '2')? $TF_PLAN_EXIT_CODE"
