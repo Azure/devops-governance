@@ -57,8 +57,10 @@ stages:
             | tee plan-output.txt
 
         # Save Exit Code from first command before pipe
+        # try index 1 (but should be zero?)
+        echo "============== Debug Pipeline =============="
         echo ""
-        export TF_PLAN_EXIT_CODE=${PIPESTATUS[0]}
+        export TF_PLAN_EXIT_CODE=${PIPESTATUS[1]}
         echo "What is pipestatus (expect '2')? $TF_PLAN_EXIT_CODE"
         if [[ "$TF_PLAN_EXIT_CODE" == "0" ]]; then
           echo "🟢 No configuration drift detected"
