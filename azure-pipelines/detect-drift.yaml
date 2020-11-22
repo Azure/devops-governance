@@ -52,10 +52,11 @@ stages:
 
         # Run `terraform plan` and save output (used later for posting to GitHub)
 
-
-
-        # debug tf plan command, no tee ;-(
-        if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID | tee plan-output.txt; exit ${PIPESTATUS[0]} ; then
+        # try multiline condition
+        if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
+            | tee plan-output.txt \
+            exit ${PIPESTATUS[0]}
+        then
           echo "😭 Zero exit code, but it should be 2 based on current state file"
         else
           echo $?
