@@ -24,10 +24,10 @@ stages:
 
 # Stage: Terraform Plan
 # ---------------------
-- stage: TFPlanStage
+- stage: terraformStage
   displayName: Detect Drift
   jobs:
-  - job: DetectDriftJob
+  - job: terraformJob
     displayName: Terraform Plan
     steps:
 
@@ -59,7 +59,7 @@ stages:
           echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
         else
           tf_exit_code=$?
-          echo "======= ⚠️  Configuration drift detected ======="
+          echo "======= ⚠️ Configuration drift detected ======="
           echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
           exit $tf_exit_code
         fi
@@ -81,9 +81,9 @@ stages:
         oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
         echo $oneliner
         echo "====="
-        echo "##vso[task.setvariable variable=planOutput;isOutput=true]$(oneliner)"
+        echo "##vso[task.setvariable variable=planOutput;isOutput=true]$(echo $oneliner)"
       displayName: Save plan output (wip)
-      name: getPlanOutputStep
+      name: outputPlanStep
       condition: always()
 
 
@@ -93,12 +93,12 @@ stages:
   displayName: Pull Request Comment
   condition: and(succeededOrFailed(), eq(variables['Build.Reason'], 'PullRequest'))
   variables:
-    github-repo-name:       Azure-Samples/devops-governance
-    github-connection-name: Azure-Samples
-    ado-org-name:           julie-msft
-    ado-project-name:       e2e-governance-demo
-    exit-code:              $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['planStep.exitCode'] ]
-    planOutput:             $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['getPlanOutputStep.planOutput'] ]
+    githubRepoName:       Azure-Samples/devops-governance
+    githuhConnectionName: Azure-Samples
+    adoOrgName:           julie-msft
+    adoProjectName:       e2e-governance-demo
+    exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
+    planOutput:           $[ stageDependencies.terraformStage.terraformJob.outputs['outputPlanStep.planOutput'] ]
   jobs:
   - job: PostCommentJob
     displayName: Post to GitHub
@@ -110,7 +110,7 @@ stages:
       displayName: Post - No Drift
       inputs:
         gitHubConnection: ${{ variables['github-connection-name'] }}
-        repositoryName: $(github-repo-name)
+        repositoryName: $(githubRepoName)
         comment: |
           🟢 No configuration drift detected
 
@@ -120,7 +120,7 @@ stages:
       displayName: Post - Has Drift
       inputs:
         gitHubConnection: ${{ variables['github-connection-name'] }}
-        repositoryName: $(github-repo-name)
+        repositoryName: $(githubRepoName)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
 
@@ -132,8 +132,5 @@ stages:
     # We can pass output to downstream stage/job.
     # But we lose newlines, making output useless for markdown.
     # Todo: create own task that reads comment contents from a file.
-    - bash: |
-        echo "-----"
-        echo $(planOutput)
-        echo "-----"
+    - bash: echo $(planOutput)
       displayName: Debug - plan output
