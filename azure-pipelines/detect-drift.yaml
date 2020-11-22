@@ -59,6 +59,7 @@ stages:
         # Save Exit Code from first command before pipe
         echo ""
         export TF_PLAN_EXIT_CODE=${PIPESTATUS[0]}
+        echo "What is pipestatus (expect '2')? $TF_PLAN_EXIT_CODE"
         if [[ "$TF_PLAN_EXIT_CODE" == "0" ]]; then
           echo "🟢 No configuration drift detected"
           echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
