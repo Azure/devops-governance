@@ -4,7 +4,10 @@ name: $(BuildID)
 pool:
   vmImage: 'ubuntu-18.04'
 
-trigger: none
+trigger:
+  branches:
+    include:
+    - main
 
 pr:
 - release
@@ -24,12 +27,14 @@ stages:
 
 # Stage: Terraform Plan
 # ---------------------
-- stage: TFPlanStage
+- stage: terraformStage
   displayName: Detect Drift
   jobs:
-  - job: DetectDriftJob
+  - job: terraformJob
     displayName: Terraform Plan
     steps:
+
+    # Step - terraform init
     - bash: |
         terraform init \
           -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
@@ -43,22 +48,25 @@ stages:
         TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
         TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
+    # Step - terraform plan
     - bash: |
         # Remember Exit Code
-        set -o pipefail
+        set -uo pipefail
 
-        # Run `terraform plan` and save output
-        terraform plan \
-          -detailed-exitcode \
-          -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
-            | tee plan-output.txt
-
-        # Save Exit Code
-        STATUS=${PIPESTATUS[@]}
-        echo "##vso[task.setvariable variable=tfPlanExit;isOutput=true]$("echo $STATUS")"
-        [[ $STATUS == "0" ]] && exit 0 || exit 1
+        # Run `terraform plan` and save output (used later for posting to GitHub)
+        if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
+            | tee plan-output.txt \
+            exit ${PIPESTATUS[0]}
+        then
+          echo "🟢 No configuration drift detected"
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
+        else
+          tf_exit_code=$?
+          echo "⚠️ Configuration drift detected"
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
+          exit $tf_exit_code
+        fi
       displayName: Terraform - Detect configuration drift
-      # continueOnError: true  # so we can post result to Pull Request
       name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
@@ -69,48 +77,88 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-    # # Multiline variables are not supported in Azure DevOps 😕
-    # - bash: |
-    #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
-    #   displayName: Save terraform plan output
-
-    # - bash: echo $(tfPlanOutput)
-    #   displayName: debug tf plan output
+    # Step - pass `terraform plan` output to downstream jobs
+    - publish: ./plan-output.txt
+      artifact: terraformPlanOutput
+      displayName: Publish 'terraform plan' output
+      condition: always()
 
 
 # Stage: Pull Request Comment
 # ---------------------------
-- stage: PRCommentStage
-  displayName: Pull Request Comment
+- stage: pullRequestCommentStage
+  displayName: Drift Status
   condition: and(succeededOrFailed(), eq(variables['Build.Reason'], 'PullRequest'))
   variables:
-    github-repo-name:       Azure-Samples/devops-governance
-    github-connection-name: Azure-Samples
-    ado-org-name:           julie-msft
-    ado-project-name:       e2e-governance-demo
-    has-drift:              ne('0', $[ dependencies.DetectDriftJob.outputs['DetectDriftJob.planStep.tfPlanExit'] ])
+    githubRepoName:       Azure-Samples/devops-governance
+    githubConnectionName: Azure-Samples
+    adoOrgName:           julie-msft
+    adoProjectName:       e2e-governance-demo
+    exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
+    artifactName:         terraformPlanOutput
+    # planOutput:           $[ stageDependencies.terraformStage.terraformJob.outputs['outputPlanStep.planOutput'] ]
   jobs:
-  - job: PostCommentJob
+  - job: postCommentJob
     displayName: Post to GitHub
     steps:
+
+    # Step - post, No Drift
     - task: GitHubComment@0
-      condition: eq(variables['has-drift'], false)
+      condition: eq(variables['exitCode'], 'zero')
       displayName: Post - No Drift
       inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
-        repositoryName: $(github-repo-name)
+        gitHubConnection: ${{ variables.githubConnectionName }}
+        repositoryName: $(githubRepoName)
         comment: |
-          🟢 No configuration drift detected
+          ### 🟢 &nbsp;No configuration drift detected
 
+          Source Version: $(Build.SourceVersion)
+
+    # Step - post, Drift detected
     - task: GitHubComment@0
-      condition: variables['has-drift']
+      condition: eq(variables['exitCode'], 'non-zero')
       displayName: Post - Has Drift
       inputs:
-        gitHubConnection: ${{ variables['github-connection-name'] }}
-        repositoryName: $(github-repo-name)
+        gitHubConnection: ${{ variables.githubConnectionName }}
+        repositoryName: $(githubRepoName)
         comment: |
           ### ⚠️ &nbsp;Configuration Drift Detected
+
+          Source Version: $(Build.SourceVersion)
 
           Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
 
           Proceed with caution!
+
+  # Debugging - Work in progress
+
+  - job: debugOutput
+    displayName: Debug Output
+    steps:
+    - download: current  # current pipeline
+      artifact: $(artifactName)
+      patterns: '*'
+      displayName: Download 'terraform plan' output
+
+    - bash: |
+        ls $(Pipeline.Workspace)
+        cat $(Pipeline.Workspace)/$(artifactName)/plan-output.txt
+      displayName: output download file
+
+    # Step - work in progress
+    # We can pass output to downstream stage/job.
+    # But we lose newlines, making output useless for markdown.
+    # Todo: create own task that reads comment contents from a file.
+    # - bash: echo $(planOutput)
+    #   displayName: Debug - plan output
+
+    # Step - work in progress
+    # Multiline variables are not supported in Azure DevOps 😕
+    # - bash: |
+    #     oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
+    #     echo $oneliner
+    #     echo "====="
+    #     echo "##vso[task.setvariable variable=planOutput;isOutput=true]$(echo $oneliner)"
+    #   displayName: Save plan output (wip)
+    #   name: outputPlanStep
+    #   condition: always()
