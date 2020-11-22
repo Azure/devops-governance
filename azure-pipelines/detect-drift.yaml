@@ -55,11 +55,11 @@ stages:
             | tee plan-output.txt \
             exit ${PIPESTATUS[0]}
         then
-          echo "======= 🟢 No configuration drift detected ======="
+          echo "🟢 No configuration drift detected"
           echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
         else
           tf_exit_code=$?
-          echo "======= ⚠️ Configuration drift detected ======="
+          echo "⚠️ Configuration drift detected"
           echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
           exit $tf_exit_code
         fi
@@ -145,5 +145,5 @@ stages:
       # patterns: 'plan-output.txt'
       displayName: Download 'terraform plan' output
 
-    - bash: cat ./plan-output.txt
+    - bash: cat ./terraformPlanOutput/plan-output.txt
       displayName: output download file
