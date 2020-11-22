@@ -59,18 +59,20 @@ stages:
         # Save Exit Code from first command before pipe
         # try index 1 (but should be zero?)
         echo "============== Debug Pipeline =============="
-        echo ""
-        export TF_PLAN_EXIT_CODE=${PIPESTATUS[1]}
-        echo "What is pipestatus (expect '2')? $TF_PLAN_EXIT_CODE"
-        if [[ "$TF_PLAN_EXIT_CODE" == "0" ]]; then
-          echo "🟢 No configuration drift detected"
-          echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
-          exit 0
-        else
-          echo "⚠️  Configuration drift detected"
-          echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
-          exit 1
-        fi
+        echo "All pipestatus(s):"
+        echo "${PIPESTATUS[*]}"
+
+        # export TF_PLAN_EXIT_CODE=${PIPESTATUS[1]}
+        # echo "What is pipestatus (expect '2')? $TF_PLAN_EXIT_CODE"
+        # if [[ "$TF_PLAN_EXIT_CODE" == "0" ]]; then
+        #   echo "🟢 No configuration drift detected"
+        #   echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
+        #   exit 0
+        # else
+        #   echo "⚠️  Configuration drift detected"
+        #   echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
+        #   exit 1
+        # fi
       displayName: Terraform - Detect configuration drift
       name: planStep
       env:
@@ -82,8 +84,9 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-    - bash: echo got exit code - $(exitCode)
-      displayName: debug exit code
+    # Doesn't work
+    # - bash: echo got exit code - $(exitCode)
+    #   displayName: debug exit code
 
     # # Multiline variables are not supported in Azure DevOps 😕
     # - bash: |
