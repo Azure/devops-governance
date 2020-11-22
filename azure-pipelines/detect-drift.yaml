@@ -32,72 +32,59 @@ stages:
     steps:
 
     # Step - terraform init
-    # - bash: |
-    #     terraform init \
-    #       -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
-    #       -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
-    #       -backend-config="key=$TF_STATE_BLOB_FILE" \
-    #       -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
-    #   displayName: Terraform - Init
-    #   env:
-    #     TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
-    #     TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
-    #     TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
-    #     TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
+    - bash: |
+        terraform init \
+          -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
+          -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
+          -backend-config="key=$TF_STATE_BLOB_FILE" \
+          -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
+      displayName: Terraform - Init
+      env:
+        TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
+        TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
+        TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
+        TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 
-    # # Step - terraform plan
-    # - bash: |
-    #     # Remember Exit Code
-    #     set -uo pipefail
+    # Step - terraform plan
+    - bash: |
+        # Remember Exit Code
+        set -uo pipefail
 
-    #     # Run `terraform plan` and save output (used later for posting to GitHub)
-    #     if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
-    #         | tee plan-output.txt \
-    #         exit ${PIPESTATUS[0]}
-    #     then
-    #       echo "======= 🟢 No configuration drift detected ======="
-    #       echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
-    #     else
-    #       tf_exit_code=$?
-    #       echo "======= ⚠️  Configuration drift detected ======="
-    #       echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
-    #       exit $tf_exit_code
-    #     fi
-    #   displayName: Terraform - Detect configuration drift
-    #   name: planStep
-    #   env:
-    #     ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
-    #     ARM_CLIENT_ID:              $(kv-arm-client-id)
-    #     ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
-    #     ARM_TENANT_ID:              $(kv-arm-tenant-id)
-    #     AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
-    #     AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
-    #     AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
+        # Run `terraform plan` and save output (used later for posting to GitHub)
+        if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
+            | tee plan-output.txt \
+            exit ${PIPESTATUS[0]}
+        then
+          echo "======= 🟢 No configuration drift detected ======="
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
+        else
+          tf_exit_code=$?
+          echo "======= ⚠️  Configuration drift detected ======="
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
+          exit $tf_exit_code
+        fi
+      displayName: Terraform - Detect configuration drift
+      name: planStep
+      env:
+        ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
+        ARM_CLIENT_ID:              $(kv-arm-client-id)
+        ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
+        ARM_TENANT_ID:              $(kv-arm-tenant-id)
+        AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
+        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
+        AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-    # Doesn't work
-    # - bash: echo got exit code - $(exitCode)
-    #   displayName: debug exit code
 
+    # Step - work in progress
     # Multiline variables are not supported in Azure DevOps 😕
     - bash: |
-        # oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
-        # echo $oneliner
+        oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
+        echo $oneliner
         echo "====="
-        echo "##vso[task.setvariable variable=planOutput;isOutput=true]DEBUG - 1st line, LOTS AND\\n2nd line LOTS OF TEXT…"
-      displayName: Save terraform plan output (try)
+        echo "##vso[task.setvariable variable=planOutput;isOutput=true]$(oneliner)"
+      displayName: Save plan output (wip)
       name: getPlanOutputStep
       condition: always()
-
-    # # works, but not useful because distinct step
-    # - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]false"
-    #   condition: succeeded()
-    #   displayName: set has_drift to false
-
-    # # works, but not useful because distinct step
-    # - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]true"
-    #   condition: failed()
-    #   displayName: set has_drift to true
-
 
 
 # Stage: Pull Request Comment
@@ -110,47 +97,43 @@ stages:
     github-connection-name: Azure-Samples
     ado-org-name:           julie-msft
     ado-project-name:       e2e-governance-demo
-    # exit-code:              $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['planStep.exitCode'] ]
+    exit-code:              $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['planStep.exitCode'] ]
     planOutput:             $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['getPlanOutputStep.planOutput'] ]
   jobs:
-  - job: TestOutput
+  - job: PostCommentJob
+    displayName: Post to GitHub
     steps:
-    # Does this work?
+
+    # Step - post, No Drift
+    - task: GitHubComment@0
+      condition: eq(variables['exit-code'], 'zero')
+      displayName: Post - No Drift
+      inputs:
+        gitHubConnection: ${{ variables['github-connection-name'] }}
+        repositoryName: $(github-repo-name)
+        comment: |
+          🟢 No configuration drift detected
+
+    # Step - post, Drift detected
+    - task: GitHubComment@0
+      condition: eq(variables['exit-code'], 'non-zero')
+      displayName: Post - Has Drift
+      inputs:
+        gitHubConnection: ${{ variables['github-connection-name'] }}
+        repositoryName: $(github-repo-name)
+        comment: |
+          ### ⚠️ &nbsp;Configuration Drift Detected
+
+          Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
+
+          Proceed with caution!
+
+    # Step - work in progress
+    # We can pass output to downstream stage/job.
+    # But we lose newlines, making output useless for markdown.
+    # Todo: create own task that reads comment contents from a file.
     - bash: |
         echo "-----"
         echo $(planOutput)
         echo "-----"
-      displayName: Does this work?
-
-    # - bash: echo "all good"
-    #   condition: eq(variables['exit-code'], 'zero')
-    #   displayName: no drift
-
-    # - bash: echo "not working"
-    #   condition: eq(variables['exit-code'], 'non-zero')
-    #   displayName: got drift
-
-  # - job: PostCommentJob
-  #   displayName: Post to GitHub
-  #   steps:
-  #   - task: GitHubComment@0
-  #     condition: eq(variables['has-drift'], false)
-  #     displayName: Post - No Drift
-  #     inputs:
-  #       gitHubConnection: ${{ variables['github-connection-name'] }}
-  #       repositoryName: $(github-repo-name)
-  #       comment: |
-  #         🟢 No configuration drift detected
-
-  #   - task: GitHubComment@0
-  #     condition: variables['has-drift']
-  #     displayName: Post - Has Drift
-  #     inputs:
-  #       gitHubConnection: ${{ variables['github-connection-name'] }}
-  #       repositoryName: $(github-repo-name)
-  #       comment: |
-  #         ### ⚠️ &nbsp;Configuration Drift Detected
-
-  #         Approving this Pull Request may result in destructive changes to your Azure resources. Please review the `terraform plan` output diff at Azure Pipelines Build Result Page.
-
-  #         Proceed with caution!
+      displayName: Debug - plan output
