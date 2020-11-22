@@ -4,7 +4,10 @@ name: $(BuildID)
 pool:
   vmImage: 'ubuntu-18.04'
 
-trigger: none
+trigger:
+  branches:
+    include:
+    - main
 
 pr:
 - release
