@@ -86,6 +86,10 @@ stages:
       name: outputPlanStep
       condition: always()
 
+    - publish: ./plan-output.txt
+      artifact: terraformPlanOutput
+      displayName: Publish 'terraform plan' output
+
 
 # Stage: Pull Request Comment
 # ---------------------------
@@ -134,3 +138,11 @@ stages:
     # Todo: create own task that reads comment contents from a file.
     - bash: echo $(planOutput)
       displayName: Debug - plan output
+
+    - download: current  # current pipeline
+      artifact: terraformPlanOutput
+      patterns: 'plan-output.txt'
+      displayName: Download 'terraform plan' output
+
+    - bash: cat ./plan-output.txt
+      displayName: output download file
