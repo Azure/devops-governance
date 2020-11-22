@@ -51,36 +51,19 @@ stages:
         set -uo pipefail
 
         # Run `terraform plan` and save output (used later for posting to GitHub)
-
-        # try multiline condition
         if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
             | tee plan-output.txt \
+            echo "========= Pipeline - Drift Detection =========" \
             exit ${PIPESTATUS[0]}
         then
-          echo "😭 Zero exit code, but it should be 2 based on current state file"
+          echo "🟢 No configuration drift detected"
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
         else
-          echo $?
-          echo "Non-zero!"
-          exit 2
+          tf_exit_code=$?
+          echo "⚠️  Configuration drift detected"
+          echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
+          exit $tf_exit_code
         fi
-
-        # Save Exit Code from first command before pipe
-        # try index 1 (but should be zero?)
-        echo "============== Debug Pipeline =============="
-        echo "All pipestatus(s):"
-        echo "${PIPESTATUS[@]}"
-
-        # export TF_PLAN_EXIT_CODE=${PIPESTATUS[1]}
-        # echo "What is pipestatus (expect '2')? $TF_PLAN_EXIT_CODE"
-        # if [[ "$TF_PLAN_EXIT_CODE" == "0" ]]; then
-        #   echo "🟢 No configuration drift detected"
-        #   echo "##vso[task.setvariable variable=exitCode;isOutput=true]zero"
-        #   exit 0
-        # else
-        #   echo "⚠️  Configuration drift detected"
-        #   echo "##vso[task.setvariable variable=exitCode;isOutput=true]non-zero"
-        #   exit 1
-        # fi
       displayName: Terraform - Detect configuration drift
       name: planStep
       env:
@@ -96,10 +79,12 @@ stages:
     # - bash: echo got exit code - $(exitCode)
     #   displayName: debug exit code
 
-    # # Multiline variables are not supported in Azure DevOps 😕
-    # - bash: |
-    #     echo "##vso[task.setvariable variable=tfPlanOutput]$(cat ./plan-output.txt)"
-    #   displayName: Save terraform plan output
+    # Multiline variables are not supported in Azure DevOps 😕
+    - bash: |
+        oneliner=$(printf "%s " $(sed -e 's/$/&\\n/' ./plan-output.txt))
+        echo "##vso[task.setvariable variable=planOutput]$oneliner"
+      displayName: Save terraform plan output (try)
+      name: getPlanOutputStep
 
     # # works, but not useful because distinct step
     # - bash: echo "##vso[task.setvariable variable=has_drift;isOutput=true]false"
@@ -124,12 +109,13 @@ stages:
     ado-org-name:           julie-msft
     ado-project-name:       e2e-governance-demo
     exit-code:              $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['planStep.exitCode'] ]
+    planOutput:             $[ stageDependencies.TFPlanStage.DetectDriftJob.outputs['getPlanOutputStep.planOutput'] ]
   jobs:
   - job: TestOutput
     steps:
-    # Does not work
-    # - bash: echo what is $[ variables['exit-code'] ] ?
-    #   displayName: echo exit code
+    # Does this work?
+    - bash: echo "$(planOutput)"
+      displayName: Does this work?
 
     - bash: echo "all good"
       condition: eq(variables['exit-code'], 'zero')
