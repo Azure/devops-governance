@@ -142,7 +142,7 @@ stages:
 
     - download: current  # current pipeline
       artifact: terraformPlanOutput
-      patterns: 'plan-output.txt'
+      # patterns: 'plan-output.txt'
       displayName: Download 'terraform plan' output
 
     - bash: cat ./plan-output.txt
