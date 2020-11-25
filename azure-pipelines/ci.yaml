@@ -15,7 +15,6 @@ trigger:
 
 pr:
 - main
-- feat/*
 
 pool:
   vmImage: 'ubuntu-18.04'

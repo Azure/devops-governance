@@ -4,11 +4,11 @@ Brief notes and considerations when automating infrastructure with [Terraform](h
 
 ### Pipeline Overview
 
-| Pipeline | Trigger | Terraform State | Detect Drift | Deploys |
+| Pipeline | Triggers | Terraform Backend | Detect Drift | Deploys |
 |:--|:--|:--|:--|:--|
-| [`ci.yaml`](./ci.yaml) | Pull Requests (PR) and major branches  | local/none | No | No |
-| [`cd.yaml`](./cd.yaml) | `release` branch only | Azure Storage | No* | Yes  |
-| [`detect-drift.yaml`](./detect-drift.yaml) | Scheduled - nightly and PRs to `release` | Azure Storage | Yes | No |
+| [`ci.yaml`](./ci.yaml) | &bull; `main` branch<br>&bull; `dev` branch<br>&bull; `feat/*` branch<br>&bull; `fix/*` branch<br>&bull; Pull Requests to `main`  | local/none | No | No |
+| [`detect-drift.yaml`](./detect-drift.yaml) | &bull; `main` branch<br>&bull; Pull Requests to `release`<br>&bull; Scheduled nightly | Azure Storage | Yes | No |
+| [`cd.yaml`](./cd.yaml) | &bull; `release` branch | Azure Storage | No* | Yes  |
 
 *The CD pipeline does not check for drift because this is checked at the pull request.
 
