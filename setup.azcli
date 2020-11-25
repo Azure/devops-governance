@@ -18,6 +18,7 @@ az group create \
 # Storage Account
 # ---------------
 # This holds your actual Terraform state file
+# Note: we explicitly disable public access.
 
 az storage account create \
 	--name $AZ_GOVDEMO_STORAGEACCT_NAME \
@@ -34,3 +35,13 @@ az storage container create \
 	--account-name $AZ_GOVDEMO_STORAGEACCT_NAME \
 	--public-acces off \
 	--auth-mode login
+
+# Shared Access Signature
+# Instead of using the access key, we will create a SAS token that expires in 7 days
+az storage account generate-sas \
+  --permissions cdlruwap \
+  --account-name $AZ_GOVDEMO_STORAGEACCT_NAME \
+  --services b \
+  --resource-types sco  \
+  --expiry $(date -v+7d '+%Y-%m-%dT%H:%MZ') \
+  -o tsv
