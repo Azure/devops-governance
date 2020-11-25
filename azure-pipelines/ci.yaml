@@ -8,10 +8,6 @@ trigger:
     - dev
     - feat/*
     - fix/*
-  paths:
-    exclude:
-    - '*.md'
-    - 'images/*'
 
 pr:
 - main
