@@ -8,20 +8,34 @@ When introducing automation via CI/CD pipelines, be aware that the Role Based Ac
 
 ![End to End Governance](./images/e2e-governance-scm-to-arm.svg)
 
+| Governance Layer | Responsibility | Description |
+|:--|:--|:--|
+| **Pull Requests** | User | Engineers should peer review their work especially the Pipeline code. |
+| **Branch Protection** | [Shared](https://docs.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility) | Configure [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops) or [GitHub](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-protected-branches) to reject changes that do not meet certain standards, e.g. CI checks and peer reviews (via pull requests). |
+| **Pipeline as Code** | User | A build server will happily delete your production environment if the pipeline code instructs it to do so. Prevent this using a combination of pull requests and branch protection rules. |
+| **[Service Connections](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml)** | [Shared](https://docs.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility) | Configure Azure DevOps to restrict access to these credentials. |
+| **Azure Resources** | [Shared](https://docs.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility) | Configure RBAC in the Azure Resource Manager. |
+
 ## Example Use Case, Business Requirements
 
-This demo is open source and intended to be used as a **Teaching Tool** for organizations who are new to DevOps and need to create a governance model for deploying to Azure. Please read this carefully to understand the decisions behind the 
+This demo is open source and intended to be used as a **Teaching Tool** for organizations who are new to DevOps and need to create a governance model for deploying to Azure. Please read this carefully to understand the decisions behind the model used in this sample repository. 
 
 Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious company with common requirements:
 
-- The organization has many vertical business units, e.g. "fruits" and "vegetables", which operate largely independently.
-- Every team has a subset of developers called "admins" with elevated privileges.
-- Every team has 2 environments
+- **Business Units**  
+  The organization has many vertical business units, e.g. "fruits" and "vegetables", which operate largely independently.
+- **Central-IT**  
+  There is a central IT team, specializing in cloud infrastructure that manages shared services used by business units. This team is called [Cloud Center of Excellence](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/organize/cloud-center-of-excellence) in Microsoft's [Cloud Adoption Framework (CAF)](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework) terminology.  
+- **AAD Groups**  
+  Every team has a subset of developers called "admins" with elevated privileges.
+- **Deployment Environemnts**  
+  Every team has 2 environments
   - Production - only admins have elevated privileges
   - Non-production - all developers have elevated privileges (to encourage experimentation and innovation)
-- Every application should implement DevOps, not just continuous integration (CI) but also (CD), i.e. deployments can be automatically triggered via changes to the git repository.
-- There is a central IT team, specializing in cloud infrastructure that manages shared services used by business units. This team is called [Cloud Center of Excellence](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/organize/cloud-center-of-excellence) in Microsoft's [Cloud Adoption Framework (CAF)](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework) terminology.
-- The organization started with an isolated project model to accelerate the journey to the cloud. But now they are exploring options to break silos and encourage collaboration by creating the "collaboration" and "supermarket" projects.
+- **Automation Goals**   
+  Every application should implement DevOps, not just continuous integration (CI) but also (CD), i.e. deployments can be automatically triggered via changes to the git repository.
+- **Cloud Journey - so far**  
+  The organization started with an isolated project model to accelerate the journey to the cloud. But now they are exploring options to break silos and encourage collaboration by creating the "collaboration" and "supermarket" projects.
 
 ## Azure Active Directory (AAD)
 
@@ -33,7 +47,7 @@ In this example, each business domain has 2 AAD groups: a general group and a su
 
 ### Roles
 
-The groups are assigned the following built-in roles in Azure and AzureDevOps. In both products, administrators are given elevated privileges. 
+The groups are assigned the following built-in roles in Azure and AzureDevOps. In both business units, administrators are given elevated privileges. 
 
 | Group Name | ARM Role | Azure DevOps Role |
 |:--|:--|:--|
@@ -46,35 +60,19 @@ In most cases, an `Owner` or `Project Administrator` has additional permissions 
 
 ## Azure Environments & Service Connections
 
-As a general security best practice, logical environments will have a governance boundary. Per Microsoft's Cloud Adoption Framework (CAF), this is usually an Azure Subscription. (TODO: link to CAF. Do not debate here)
+As a general security best practice, logical environments will have a governance boundary. Per Microsoft's Cloud Adoption Framework (CAF), it is recommended to [use Azure Subscription as the governance boundary](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/govern/guides/standard/#governance-best-practices).
 
 ### How to Secure Environments in Azure DevOps
 
 #### Not Via Environments
 
-Azure DevOps has an "Environments" feature that allows you to secure Virtual Machines (VMs) and Kubernetes Namespaces. This example does **not** use environments because when creating [pipelines as Code](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops#security), this mechanism is no longer a security boundary. Environments, however, are still useful for [deployment histories](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops#deployment-history-within-environments) and auditing purposes.
+Azure DevOps has an "Environments" feature that allows you to secure Virtual Machines (VMs) and Kubernetes Namespaces. This example does **not** use environments because when creating [pipelines as Code](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops#security), this mechanism is no longer a security boundary. For details, see the purple footnote box in this [documention](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops#user-permissions).
+
+Environments, however, are still useful for [deployment histories](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments?view=azure-devops#deployment-history-within-environments) and auditing purposes.
 
 #### Via Service Connections
 
-A service connection is essentially a service principal. Just as you have a service principal per environment, you will have a service connection per environment, e.g. DEV vs PROD.
+A service connection is essentially a service principal. Just as you have a service principal per environment, you will have a service connection per environment, e.g. development vs production.
 
 <img src="./images/ado-service-connections-environments.svg">
 
-
------
-
-
-
-## Multi-tier Governance 
-
-When developing a governance model for your organization, it is important to remember that Azure Resource Management (ARM) is only _one_ way to manage resources. When introducing automation via CI/CD pipelines, the Role Based Access Control (RBAC) model must be applied at multiple layers, including:
-
-![End to End Governance](./images/e2e-governance-scm-to-arm.svg)
-
-| Tier | Responsibility | Description |
-|:--|:--|:--|
-| **Pull Requests** | User | Engineers should peer review their work especially the Pipeline code. |
-| **Branch Protection** | [Shared](https://docs.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility) | Configure [Azure DevOps](https://docs.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops) or [GitHub](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-protected-branches) to reject changes that do not meet certain standards, e.g. CI checks and peer reviews (via pull requests). |
-| **Pipeline as Code** | User | A build server will happily delete your production environment the pipeline code instructs it to. Prevent this using a combination of pull requests and branch protection rules. |
-| **[Service Connections](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml)** | [Shared](https://docs.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility) | Configure Azure DevOps to restrict access to these credentials. |
-| **Azure Resources** | [Shared](https://docs.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility) | Configure RBAC in the Azure Resource Manager. |
