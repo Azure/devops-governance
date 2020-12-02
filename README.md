@@ -33,7 +33,7 @@ When introducing automation via CI/CD pipelines, be aware that the Role Based Ac
 
 ## Azure Resources Created
 
-When run Terraform will create the following resources. Note: random suffix used to ensure globally unique names, e.g. `u6t7` are omitted for clarity.
+When run Terraform will create the following resources. Note: random suffix used to ensure globally unique names, e.g. `u6t7` but are omitted here for clarity.
 
 ### Azure AD Groups
 
@@ -73,14 +73,14 @@ Preview of the Azure DevOps organization created by this code sample. Icons by [
 - **Service Connection** using Contributor Service Principal
 - **Service Connection** using Key Vault read-only Service Principal for Pipeline Secrets Integration
 
-Note: Key Vault Integration must be configured by hand.
+Note: At time of this writing there is [no REST API (v6 )for Key Vault Integration](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/variablegroups/add?view=azure-devops-rest-6.0). Therefore it must be [configured manually](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/azure-key-vault?view=azure-devops). 
 
 
 ### Azure Resources (ARM)
 
 #### Resource Groups aka Environment
 
-N.B. Each resource group is intended to be a logical and security boundary, i.e. "environment". In practice per [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework), these boundaries would be Azure Subscriptions, not resource groups.
+N.B. Each resource group is intended to be a logical and security boundary, i.e. "environment". In practice per [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework), these boundaries [should be Azure Subscriptions, not Resource Groups](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/govern/guides/standard/#governance-best-practices).
 
 - `fruits-dev-rg`
 - `fruits-prod-rg`
