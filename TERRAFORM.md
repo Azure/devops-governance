@@ -2,6 +2,10 @@
 
 How to deploy this example in your own Azure account(s).
 
+## Disclaimer - not for production
+
+This code is NOT meant to be used for production. While great efforts were taken for code quality and best practices, certain decisions were made for convenience. For example, this demo uses resource groups to separate environments. In practice, however, [Azure subscriptions are a better choice](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/govern/guides/standard/#governance-best-practices) per Microsoft's [Cloud Adoption Framework (CAF)](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework).
+
 ## Pre-requisites
 
 If you have a [Visual Studio subscription](https://visualstudio.microsoft.com/subscriptions/), use that for this demo so that the elevated service principals required have NO access to your actual Azure environments.
@@ -36,16 +40,23 @@ If you are using this project sample for its [Azure Pipelines](https://azure.mic
 
 ## Terraform 
 
-### Login and Configure Environment
+### Login
+
+Make sure you are authenticated to Azure. 
+
+- If you are deploying from a local machine, use `az login`
+- If you are deploying from a headless agent, [authenticate using a service principal and client secret](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_client_secret) as described in the Terrform documentation.
+
+### Configure Environment
 
 The [Azure DevOps Provider](https://www.terraform.io/docs/providers/azuredevops/index.html) in Terraform expects the following environment variables to be set.
 
 ```
-export AZDO_ORG_SERVICE_URL="https://dev.azure.com/your-demo-org-name"
-export AZDO_PERSONAL_ACCESS_TOKEN="…"
+AZDO_ORG_SERVICE_URL="https://dev.azure.com/<your-demo-org-name>"
+AZDO_PERSONAL_ACCESS_TOKEN="…"
 ```
 
-Replace `your-demo-org-name` with the name of your organization. And remember to set your Azure DevOps Personal Access Token (PAT).
+Replace `<your-demo-org-name>` with the name of your organization. And remember to set your Azure DevOps Personal Access Token (PAT).
 
 ### terraform init
 
@@ -61,7 +72,7 @@ Then continue to [Create Deployment Plan &rarr;](##create-deployment-plan)
 
 ### Configure Azure Backend for Terraform (optional)
 
-If you're configuring for CI/CD or just want to try using remote backend for terraform state, please do these additional steps.
+If you're configuring for a headless CI/CD agent or just want to try using remote backend for terraform state, please follow these additional steps.
 
 It is preferred to use the Azure CLI. See [setup.azcli](./setup.azcli) for full commands.
 
@@ -71,7 +82,7 @@ It is preferred to use the Azure CLI. See [setup.azcli](./setup.azcli) for full 
 | [Create Blob container](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction#containers) | `az storage container create …` |
 | [Generate SAS token](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature) for this storage account | `az storage account generate-sas …` | 
 
-*Don't forget to [disable public read access](https://docs.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-configure?tabs=portal) - otherwise everyone can read your service principal credentials!
+*Don't forget to [disable public read access](https://docs.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-configure?tabs=portal) - otherwise everyone can read your credentials!
 
 #### Configure Backend
 
@@ -455,6 +466,3 @@ workspaces = [
 
 Note also that no secrets are outputted, just where to go find them afterwards, e.g. `See 'kv-reader-sp-secret' in Key Vault 'fruits-dev-u6t7-kv'`
 
-## Disclaimer - not for production
-
-This code is NOT meant to be used for production. While great efforts were taken for code quality and best practices, certain decisions were made for convenience. For example, this demo uses resource groups to separate environments. In practice, however, Azure subscriptions are a better choice per Microsoft's [Cloud Adoption Framework (CAF)](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework).
