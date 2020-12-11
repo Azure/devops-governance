@@ -4,13 +4,13 @@
 
 When developing a governance model for your organization, it is important to remember that Azure Resource Management (ARM) is only _one_ way to manage resources. Other deployment methods must also be secured and governance applied.
 
-When introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
+By introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
 
 The following diagram illustrates a baseline CI/CD workflow with [Azure DevOps](https://dev.azure.com). The red lock icon <img src="./images/icon-lock.svg" valign="bottom"> indicates security permissions which must be configured by the user. Not configuring or mis-configuring permissions will leave your workloads vulnerable.
 
 ![End to End Governance](./images/e2e-governance-scm-to-arm.svg)
 
-To successfully secure your workloads, you must leverage a combination of security permissions configurations and human checks in your workflow. RBAC will prevent individual developers from making destructive changes. Build pipelines, however often run with priviledged identities and will happily destroy your workloads if instructed to do so in the pipeline code. To prevent this from happening, you should configure [branch policies](https://docs.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops) on your repository to require human approval before accepting changes that trigger automation pipelines.
+To successfully secure your workloads, you must leverage a combination of security permissions configurations and human checks in your workflow. RBAC will prevent individual developers from making destructive changes. Build pipelines, however often run with privileged identities and will happily destroy your workloads if instructed to do so in the pipeline code. To prevent this from happening, you should configure [branch policies](https://docs.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops) on your repository to require human approval before accepting changes that trigger automation pipelines.
 
 | Deployment Step | Responsibility | Description |
 |:--|:--|:--|
@@ -34,7 +34,7 @@ Any governance model must be tied to the organization's business rules, which ar
   There is a central IT team, specializing in cloud infrastructure that manages shared services used by business units. This team is called [Cloud Center of Excellence](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/organize/cloud-center-of-excellence) in Microsoft's [Cloud Adoption Framework (CAF)](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework) terminology.  
 - **AAD Groups**  
   Every team has a subset of developers called "admins" with elevated privileges.
-- **Deployment Environemnts**  
+- **Deployment Environments**  
   Every team has 2 environments
   - Production - only admins have elevated privileges
   - Non-production - all developers have elevated privileges (to encourage experimentation and innovation)
@@ -72,17 +72,17 @@ Because your source code defines and triggers deployments, your first line of de
 
 ![Pull Request Workflow](./images/git-pr-worflow.svg)
 
-When planning your end to end governance model, your priviledged users, e.g. `veggies-admins` will be responsible for configuring branch protection. Common branch protection checks to secure your deployments include:
+When planning your end to end governance model, your privileged users, e.g. `veggies-admins` will be responsible for configuring branch protection. Common branch protection checks to secure your deployments include:
 
 - **Require CI build to pass**   
-  Useful for establishing baseline code quality, e.g. linting, unit tests and even security checks e.g. virus and credential scans.
+  Useful for establishing baseline code quality, e.g. code linting, unit tests and even security checks e.g. virus and credential scans.
 
 - **Require peer review**  
   Have another human double check that code works as intended. Be extra careful when changes are made to pipeline code. Combine with CI builds to make peer reviews less tedious. 
 
 #### What happens if a developer tries to push directly to production?
 
-Remember that git is distributed SCM system. A developer may choose to commit directly to their local `production` branch. But when conigured, this push can be rejected by the git server. For example:
+Remember that git is distributed SCM system. A developer may choose to commit directly to their local `production` branch. But when configured, this push can be rejected by the git server. For example:
 
 ```
 remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
@@ -93,7 +93,7 @@ To https://github.com/Azure-Samples/devops-governance
 error: failed to push some refs to 'https://github.com/Azure-Samples/devops-governance'
 ```
 
-Please note the workflow above is vendor agnostic. The pull request and branch protection features are availble from multiple SCM providers including [Azure Repos](https://azure.microsoft.com/services/devops/repos/), [GitHub](https://github.com) and [GitLab](https://gitlab.com).
+Please note the workflow above is vendor agnostic. The pull request and branch protection features are available from multiple SCM providers including [Azure Repos](https://azure.microsoft.com/services/devops/repos/), [GitHub](https://github.com) and [GitLab](https://gitlab.com).
 
 Once the code has been accepted into a protected branch the next layer of access controls will be applied by the build server, e.g. [Azure Pipelines](https://azure.microsoft.com/services/devops/pipelines/).
 
@@ -119,7 +119,7 @@ At a minimum configure [User](https://docs.microsoft.com/en-us/azure/devops/pipe
 When you configure a check, the Azure DevOps service will perform this check before giving the job (and required credentials) to a headless CI/CD agent to run. Common checks include:
 
 - **Manual Approval**  
-  Depending on your business proceses, it may be useful to require additional human approval for example from a business owner before deploying to your production environment.
+  Depending on your business processes, it may be useful to require additional human approval for example from a business owner before deploying to your production environment.
 
 - **Required Template**  
   If your organization has required security measures e.g. credential scanning or open source license audits, you can use the "required template" option to ensure these steps are run before deploying. For details see [Azure Pipelines > Security Best Practices > Set Required Template](https://docs.microsoft.com/en-us/azure/devops/pipelines/security/templates?view=azure-devops#set-required-templates).
