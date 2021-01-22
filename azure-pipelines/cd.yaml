@@ -4,7 +4,7 @@ name: $(BuildID)
 trigger:
   branches:
     include:
-    - release
+    - deploy
   paths:
     exclude:
     - '*.md'

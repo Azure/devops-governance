@@ -10,7 +10,7 @@ trigger:
     - main
 
 pr:
-- release
+- deploy
 
 schedules:
   - cron: "0 0 * * *"
