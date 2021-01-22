@@ -90,8 +90,8 @@ stages:
   displayName: Drift Status
   condition: and(succeededOrFailed(), eq(variables['Build.Reason'], 'PullRequest'))
   variables:
-    githubRepoName:       Azure-Samples/devops-governance
-    githubConnectionName: Azure-Samples
+    githubRepoName:       Azure/devops-governance
+    githubConnectionName: e2e-governance-demo
     adoOrgName:           julie-msft
     adoProjectName:       e2e-governance-demo
     exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
