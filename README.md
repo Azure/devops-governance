@@ -6,8 +6,8 @@ This demo project deploys Azure resources and bootstraps Azure DevOps projects t
 
 | Status | Description |
 |:--|:--|
-| [![CD - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/continuous-deployment?branchName=release)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=27&branchName=release) | Deployment Azure Resources and Azure DevOps |
-| [![Configuration Drift - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/detect-configuration-drift?branchName=release)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=31&branchName=release) | Detect Configuration Drift (scheduled nightly) |
+| [![CD - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/continuous-deployment-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=34&branchName=deploy) | Deployment Azure Resources and Azure DevOps |
+| [![Detect Drift - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/detect-drift-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=35&branchName=deploy) | Detect Configuration Drift (scheduled nightly) |
 
 ### Abstract
 
