@@ -18,7 +18,7 @@ schedules:
     always: true
     branches:
       include:
-      - release
+      - deploy
 
 variables:
   - group: e2e-gov-demo-kv
