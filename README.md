@@ -2,22 +2,14 @@
 
 This demo project deploys Azure resources and bootstraps Azure DevOps projects to illustrate end-to-end RBAC, including best practices and pitfalls. It follows principles from Microsoft's [Cloud Adoption Framework (CAF)](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework).
 
-![End to End Governance](./images/e2e-governance-scm-to-arm.svg)
-
 | Status | Description |
 |:--|:--|
 | [![CD - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/continuous-deployment-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=34&branchName=deploy) | Deployment Azure Resources and Azure DevOps |
 | [![Detect Drift - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/detect-drift-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=35&branchName=deploy) | Detect Configuration Drift (scheduled nightly) |
 
-### Abstract
-
-When developing a governance model for your organization, it is important to remember that Azure Resource Management (ARM) is only _one_ way to manage resources. 
-
-When introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
-
 ### Table of Contents
 
-- #### [Concept](./CONCEPT.md)
+- #### [Concept - End to End Governance](./docs/README.md)
   - Use Case, Requirements
   - Azure AD Groups and Role Based Access Controls (RBAC)
   - Securing environments - Production vs Non-production
@@ -31,7 +23,35 @@ When introducing automation via CI/CD pipelines, be aware that the Role Based Ac
   - Setup and Install
   - Deploy
 
-## Azure Resources Created
+## Abstract - Did You Close the Security Backdoor?
+
+When developing a governance model for your organization, it is important to remember that Azure Resource Management (ARM) is only _one_ way to manage resources. 
+
+[![End to End Governance](./docs/images/e2e-governance-overview-v3.png)](./docs/README.md)
+
+When introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
+
+In a nutshell, you can achieve this by leveraging Azure Active Directory and connecting all role assignments (both Azure DevOps _and_ ARM) to this single identity management plane.
+
+**[More details about concept &rarr;](./docs/README.md)**
+
+
+## How to Use this Demo
+
+The Terraform Infrastructure as Code in this repository will bootstrap various resources for you:
+
+- Azure Resources (ARM)
+- Azure AD Groups
+- Service Principals
+- Azure DevOps Projects incl. Service Connections, Security Group Assignments, etc.
+
+Preview of the Azure DevOps organization created by this code sample. Icons by [Smashicons](https://www.flaticon.com/authors/smashicons) not included.
+
+<img src="./docs/images/ado-demo-home.png" alt="Preview of the Azure DevOps organization" width="600">
+
+Note: this project is used for workshops and demos and not intended to be used for production.
+
+#### Note: Random Generated Suffix
 
 When run Terraform will create the following resources. Note: random suffix used to ensure globally unique names, e.g. `u6t7` but are omitted here for clarity.
 
@@ -39,12 +59,15 @@ When run Terraform will create the following resources. Note: random suffix used
 
 | Group Name | ARM Role | Azure DevOps Role |
 |:--|:--|:--|
-| `infra` | Contributor | Contributor |
-| `fruits` | Contributor | Contributor |
-| `veggies` | Contributor | Contributor |
-| `infra-admins` | Owner | Project Administrators |
+| `fruits-all` | ? | ? |
+| `fruits-devs` | Contributor | Contributor |
 | `fruits-admins` | Owner | Project Administrators |
+| `veggies-all` | ? | ? |
+| `veggies-devs` | Contributor | Contributor |
 | `veggies-admins` | Owner | Project Administrators |
+| `infra-all` | ? | ? |
+| `infra-devs` | Contributor | Contributor |
+| `infra-admins` | Owner | Project Administrators |
 
 ### Azure DevOps
 
@@ -62,11 +85,6 @@ The project structure illustrates different governance models and their trade-of
 | `collaboration` | Yes | No | No | 
 | `central-it` | No | Yes | Yes | 
 | `supermarket` | Yes | Yes | Yes | 
-
-
-Preview of the Azure DevOps organization created by this code sample. Icons by [Smashicons](https://www.flaticon.com/authors/smashicons) not included.
-
-<img src="./images/ado-demo-home.png" alt="" width="600">
 
 #### Azure Pipelines
 
