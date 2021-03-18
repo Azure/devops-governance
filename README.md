@@ -7,6 +7,7 @@ This demo project deploys Azure resources and bootstraps Azure DevOps projects t
 | [![CD - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/continuous-deployment-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=34&branchName=deploy) | Deployment Azure Resources and Azure DevOps |
 | [![Detect Drift - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/detect-drift-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=35&branchName=deploy) | Detect Configuration Drift (scheduled nightly) |
 
+
 ### Table of Contents
 
 - #### [Concept - End to End Governance](./docs/README.md)
@@ -27,14 +28,11 @@ This demo project deploys Azure resources and bootstraps Azure DevOps projects t
 
 When developing a governance model for your organization, it is important to remember that Azure Resource Management (ARM) is only _one_ way to manage resources. 
 
-[![End to End Governance](./docs/images/e2e-governance-overview-v3.png)](./docs/README.md)
+[![End to End Governance](./images/e2e-governance-overview.svg)](./docs/README.md)
 
 When introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
 
 In a nutshell, you can achieve this by leveraging Azure Active Directory and connecting all role assignments (both Azure DevOps _and_ ARM) to this single identity management plane.
-
-**[More details about concept &rarr;](./docs/README.md)**
-
 
 ## How to Use this Demo
 
@@ -47,9 +45,7 @@ The Terraform Infrastructure as Code in this repository will bootstrap various r
 
 Preview of the Azure DevOps organization created by this code sample. Icons by [Smashicons](https://www.flaticon.com/authors/smashicons) not included.
 
-<img src="./docs/images/ado-demo-home.png" alt="Preview of the Azure DevOps organization" width="600">
-
-Note: this project is used for workshops and demos and not intended to be used for production.
+<img src="./images/ado-demo-home.png" alt="Preview of the Azure DevOps organization" width="600">
 
 #### Note: Random Generated Suffix
 
@@ -59,13 +55,13 @@ When run Terraform will create the following resources. Note: random suffix used
 
 | Group Name | ARM Role | Azure DevOps Role |
 |:--|:--|:--|
-| `fruits-all` | ? | ? |
+| `fruits-all` | - | - |
 | `fruits-devs` | Contributor | Contributor |
 | `fruits-admins` | Owner | Project Administrators |
-| `veggies-all` | ? | ? |
+| `veggies-all` | - | - |
 | `veggies-devs` | Contributor | Contributor |
 | `veggies-admins` | Owner | Project Administrators |
-| `infra-all` | ? | ? |
+| `infra-all` | - | - |
 | `infra-devs` | Contributor | Contributor |
 | `infra-admins` | Owner | Project Administrators |
 
@@ -91,7 +87,7 @@ The project structure illustrates different governance models and their trade-of
 - **Service Connection** using Contributor Service Principal
 - **Service Connection** using Key Vault read-only Service Principal for Pipeline Secrets Integration
 
-Note: At time of this writing there is [no REST API (v6 )for Key Vault Integration](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/variablegroups/add?view=azure-devops-rest-6.0). Therefore it must be [configured manually](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/azure-key-vault?view=azure-devops). 
+Note: At time of this writing there is [no REST API (v6) for Key Vault Integration](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/variablegroups/add?view=azure-devops-rest-6.0). Therefore it must be [configured manually](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/azure-key-vault?view=azure-devops). 
 
 
 ### Azure Resources (ARM)
