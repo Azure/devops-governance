@@ -1,3 +1,24 @@
+data "azurerm_client_config" "current" {}
+
+# Suffix
+# ------
+# Some Azure resources, e.g. storage accounts must have globally
+# unique names. Use a suffix to avoid automation errors.
+
+resource "random_string" "suffix" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
+locals {
+  suffix = random_string.suffix.result
+
+  # Default to current ARM client
+  superadmins_aad_object_id = var.superadmins_aad_object_id == "" ? data.azurerm_client_config.current.object_id : var.superadmins_aad_object_id
+}
+
+
 # Azure AD Groups
 # ---------------
 
@@ -108,7 +129,7 @@ module "workspace" {
   name                 = "${each.value.team}-${each.value.env}-${local.suffix}"
   team_group_id        = azuread_group.groups["${each.value.team}_devs"].id
   admin_group_id       = azuread_group.groups["${each.value.team}_admins"].id
-  superadmins_group_id = var.superadmins_aad_object_id
+  superadmins_group_id = local.superadmins_aad_object_id
 }
 
 

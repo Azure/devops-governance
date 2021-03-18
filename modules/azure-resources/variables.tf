@@ -2,7 +2,6 @@ variable "name" {
   type        = string
   description = "Base name of your workspace that will be used in resource names. Please use lowercase with dashes."
 
-
   validation {
     condition     = length(var.name) < 20
     error_message = "Name must be less than 20 characters."
@@ -44,7 +43,7 @@ variable "client_object_id" {
 
 variable "tags" {
   description = "Tags to apply to Azure Resources"
-  type    = map(string)
+  type        = map(string)
   default = {
     demo   = "governance"
     devops = "true"
@@ -53,9 +52,9 @@ variable "tags" {
   }
 }
 
-# Variables - Normalized
-
 data "azurerm_client_config" "current" {}
+
+# Variables - Normalized
 
 locals {
   name             = lower(var.name)
