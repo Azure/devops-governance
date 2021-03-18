@@ -3,6 +3,7 @@ variable "ado_project_id" {
   type        = string
 }
 
+# TODO: rename to devs_aad_id
 variable "team_aad_id" {
   description = "AAD Group ID to receive 'Contributor' permissions"
   type        = string

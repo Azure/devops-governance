@@ -80,9 +80,9 @@ data "azuread_service_principal" "workspace_sp" {
 }
 
 resource "azurerm_key_vault_access_policy" "workspace_sp" {
-  key_vault_id   = azurerm_key_vault.kv.id
-  object_id      = data.azuread_service_principal.workspace_sp.id
-  tenant_id      = local.client_tenant_id
+  key_vault_id = azurerm_key_vault.kv.id
+  object_id    = data.azuread_service_principal.workspace_sp.id
+  tenant_id    = local.client_tenant_id
 
   secret_permissions = [
     "backup",
@@ -103,9 +103,9 @@ data "azuread_service_principal" "kv_reader_sp" {
 }
 
 resource "azurerm_key_vault_access_policy" "kv_reader" {
-  key_vault_id   = azurerm_key_vault.kv.id
-  object_id      = data.azuread_service_principal.kv_reader_sp.id
-  tenant_id      = local.client_tenant_id
+  key_vault_id = azurerm_key_vault.kv.id
+  object_id    = data.azuread_service_principal.kv_reader_sp.id
+  tenant_id    = local.client_tenant_id
 
   key_permissions = [
     "get",
@@ -115,7 +115,6 @@ resource "azurerm_key_vault_access_policy" "kv_reader" {
     "get",
   ]
 }
-
 
 # KEY VAULT SECRETS
 # -----------------
