@@ -4,8 +4,7 @@
 # SP - Workspace (scoped to resource group)
 
 resource "azuread_application" "workspace_sp" {
-  name = "${local.name}-rg-sp"
-
+  display_name = "${local.name}-rg-sp"
   depends_on = [
     azurerm_resource_group.workspace
   ]
@@ -25,7 +24,7 @@ resource "azuread_service_principal" "workspace_sp" {
 # SP - Key Vault Reader (just for Azure Pipeline)
 
 resource "azuread_application" "kv_reader_sp" {
-  name = "${local.name}-kv-reader-sp"
+  display_name = "${local.name}-kv-reader-sp"
 }
 
 resource "azuread_application_password" "kv_reader_sp_secret" {

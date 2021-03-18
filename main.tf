@@ -3,7 +3,7 @@
 
 resource "azuread_group" "groups" {
   for_each                = var.groups
-  name                    = "demo-${each.value}-${local.suffix}"
+  display_name            = "demo-${each.value}-${local.suffix}"
   prevent_duplicate_names = true
 }
 
