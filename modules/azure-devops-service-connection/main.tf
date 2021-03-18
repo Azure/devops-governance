@@ -13,7 +13,7 @@ data "azurerm_key_vault_secret" "sp_secret" {
 # 2 - get reference to ADO Project
 
 data "azuredevops_project" "team" {
-  project_name = local.project_name
+  name = local.project_name
 }
 
 # 3 -get Subscription Info

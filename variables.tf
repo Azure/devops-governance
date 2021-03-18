@@ -32,11 +32,14 @@ locals {
 variable "groups" {
   type = map(string)
   default = {
-    fruits         = "fruits"
+    fruits         = "fruits-all"
+    fruits_devs    = "fruits-devs"
     fruits_admins  = "fruits-admins"
+    veggies        = "veggies-all"
+    veggies_devs   = "veggies-devs"
     veggies_admins = "veggies-admins"
-    veggies        = "veggies"
     infra          = "infra"
+    infra_devs     = "infra-dev"
     infra_admins   = "infra-admins"
   }
 }

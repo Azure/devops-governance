@@ -13,7 +13,7 @@ resource "azuread_group" "groups" {
 
 resource "azuredevops_project" "team_projects" {
   for_each        = var.projects
-  project_name    = each.value.name
+  name            = each.value.name
   description     = each.value.description
   visibility      = "private"
   version_control = "Git"
@@ -31,14 +31,14 @@ module "ado_standard_permissions" {
   for_each       = var.projects
   source         = "./modules/azure-devops-permissions"
   ado_project_id = azuredevops_project.team_projects["proj_${each.value.team}"].id
-  team_aad_id    = azuread_group.groups[each.value.team].id
+  team_aad_id    = azuread_group.groups["${each.value.team}_devs"].id
   admin_aad_id   = azuread_group.groups["${each.value.team}_admins"].id
 }
 
 # Supermarket Project
 
 resource "azuredevops_project" "supermarket" {
-  project_name    = "supermarket"
+  name            = "supermarket"
   description     = "Example: 1 project, many teams, many repos"
   visibility      = "private"
   version_control = "Git"
@@ -52,24 +52,25 @@ resource "azuredevops_project" "supermarket" {
   }
 }
 
+# TODO: supermarket collab model with devs, admins and all
 module "supermarket_permissions_fruits" {
   source         = "./modules/azure-devops-permissions"
   ado_project_id = azuredevops_project.supermarket.id
-  team_aad_id    = azuread_group.groups["fruits"].id
+  team_aad_id    = azuread_group.groups["fruits_devs"].id
   admin_aad_id   = azuread_group.groups["fruits_admins"].id
 }
 
 module "supermarket_permissions_veggies" {
   source         = "./modules/azure-devops-permissions"
   ado_project_id = azuredevops_project.supermarket.id
-  team_aad_id    = azuread_group.groups["veggies"].id
+  team_aad_id    = azuread_group.groups["veggies_devs"].id
   admin_aad_id   = azuread_group.groups["veggies_admins"].id
 }
 
 # Shared Collaboration
 
 resource "azuredevops_project" "collaboration" {
-  project_name    = "shared-collaboration"
+  name            = "shared-collaboration"
   description     = "Example: what if separate teams should talk to each other? (Disadvantage: cannot link external project commits to work items in this project)"
   visibility      = "private"
   version_control = "Git"
@@ -86,14 +87,14 @@ resource "azuredevops_project" "collaboration" {
 module "collaboration_permissions_fruits" {
   source         = "./modules/azure-devops-permissions"
   ado_project_id = azuredevops_project.collaboration.id
-  team_aad_id    = azuread_group.groups["fruits"].id
+  team_aad_id    = azuread_group.groups["fruits_devs"].id
   admin_aad_id   = azuread_group.groups["fruits_admins"].id
 }
 
 module "collaboration_permissions_veggies" {
   source         = "./modules/azure-devops-permissions"
   ado_project_id = azuredevops_project.collaboration.id
-  team_aad_id    = azuread_group.groups["veggies"].id
+  team_aad_id    = azuread_group.groups["veggies_devs"].id
   admin_aad_id   = azuread_group.groups["veggies_admins"].id
 }
 
@@ -105,7 +106,7 @@ module "workspace" {
   for_each             = var.environments
   source               = "./modules/azure-resources"
   name                 = "${each.value.team}-${each.value.env}-${local.suffix}"
-  team_group_id        = azuread_group.groups[each.value.team].id
+  team_group_id        = azuread_group.groups["${each.value.team}_devs"].id
   admin_group_id       = azuread_group.groups["${each.value.team}_admins"].id
   superadmins_group_id = var.superadmins_aad_object_id
 }
