@@ -24,7 +24,7 @@ If you are using this project sample for its [Azure Pipelines](https://azure.mic
 ### Azure Active Directory
 
 - **Azure AD Tenant**  
-  If you have a non-production tenant, use it because the following service principal is very sensitive. 
+  If you have a non-production tenant, use it because the following service principal is very privileged. 
 
 - **User or Service Principal**   
   with elevated privileges so that it can manage Azure Active Directory. [Follow these steps per Terraform documentation](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration) to properly configure your Service Principal.
@@ -51,16 +51,22 @@ Make sure you are authenticated to Azure.
 
 The [Azure DevOps Provider](https://www.terraform.io/docs/providers/azuredevops/index.html) in Terraform expects the following environment variables to be set.
 
+To make this easier, create a `.env` file using the included `.env.sample` as a template and fill in your values:
+
 ```
-AZDO_ORG_SERVICE_URL="https://dev.azure.com/<your-demo-org-name>"
-AZDO_PERSONAL_ACCESS_TOKEN="…"
+export AZDO_ORG_SERVICE_URL="https://dev.azure.com/<your-demo-org-name>"
+export AZDO_PERSONAL_ACCESS_TOKEN="…"
 ```
 
-Replace `<your-demo-org-name>` with the name of your organization. And remember to set your Azure DevOps Personal Access Token (PAT).
+Then load the variables into your shell:
+
+```bash
+source ./.env
+```
 
 ### terraform init
 
-#### From local computer
+#### From local computer (recommended)
 
 Assuming you are logged in with `az login`, just run
 
@@ -70,7 +76,7 @@ terraform init -backend=false
 
 Then continue to [Create Deployment Plan &rarr;](##create-deployment-plan)
 
-### Configure Azure Backend for Terraform (optional)
+#### Configure Azure Backend for Terraform (optional)
 
 If you're configuring for a headless CI/CD agent or just want to try using remote backend for terraform state, please follow these additional steps.
 
@@ -120,7 +126,7 @@ terraform apply demo.tfplan
 
 Please see [azure-pipelines/README.md](./azure-pipelines/README.md) for additional technical implementation details.
 
-### Example Output
+## Example Output
 
 If it works, you will see something like the output below, which you can also find in the [Pipeline Build Results](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=27&branchName=release) for this project. 
 
