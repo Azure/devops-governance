@@ -53,6 +53,11 @@ When run Terraform will create the following resources. Note: random suffix used
 
 ### Azure AD Groups
 
+Note: the `-all` groups are currently not in use but was introduced to fix a conceptual problem (see [#12](https://github.com/Azure/devops-governance/issues/12)):
+
+- Azure Resource Manager uses an [_additive_ permissions](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview#multiple-role-assignments) model
+- Azure DevOps uses a [_least_ permissions](https://docs.microsoft.com/en-us/azure/devops/organizations/security/about-permissions?view=azure-devops&tabs=preview-page) model
+
 | Group Name | ARM Role | Azure DevOps Role |
 |:--|:--|:--|
 | `fruits-all` | - | - |
@@ -65,9 +70,9 @@ When run Terraform will create the following resources. Note: random suffix used
 | `infra-devs` | Contributor | Contributor |
 | `infra-admins` | Owner | Project Administrators |
 
-### Azure DevOps
+In the future when we bootstrap the `supermarket` project, we will need all 3 categories of AAD groups.
 
-#### Projects
+### Azure DevOps Projects
 
 The project structure illustrates different governance models and their trade-offs. 
 
@@ -82,7 +87,7 @@ The project structure illustrates different governance models and their trade-of
 | `central-it` | No | Yes | Yes | 
 | `supermarket` | Yes | Yes | Yes | 
 
-#### Azure Pipelines
+### Azure Pipelines
 
 - **Service Connection** using Contributor Service Principal
 - **Service Connection** using Key Vault read-only Service Principal for Pipeline Secrets Integration
@@ -90,11 +95,9 @@ The project structure illustrates different governance models and their trade-of
 Note: At time of this writing there is [no REST API (v6) for Key Vault Integration](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/variablegroups/add?view=azure-devops-rest-6.0). Therefore it must be [configured manually](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/azure-key-vault?view=azure-devops). 
 
 
-### Azure Resources (ARM)
+### Azure Resource Groups as "Environments"
 
-#### Resource Groups aka Environment
-
-N.B. Each resource group is intended to be a logical and security boundary, i.e. "environment". In practice per [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework), these boundaries [should be Azure Subscriptions, not Resource Groups](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/govern/guides/standard/#governance-best-practices).
+To reduce complexity for CI/CD automation of _this_ open source repository, this project uses resource groups as a logical and security boundary for deployments.
 
 - `fruits-dev-rg`
 - `fruits-prod-rg`
@@ -102,15 +105,7 @@ N.B. Each resource group is intended to be a logical and security boundary, i.e.
 - `veggies-prod-rg`
 - `infra-shared-rg`
 
-#### Environment Resources
-
-Each "environment" has
-
-- Azure Storage Account
-- Azure Key Vault
-- Service Principal - Contributor for automation
-- Service Principal - Read-Only for Key Vault (used for Integration with Azure Pipelines Secrets)
-
+Be aware that in practice per [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework), these boundaries [should be Azure Subscriptions](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/govern/guides/standard/#governance-best-practices), not Resource Groups.
 
 # Contributing
 
