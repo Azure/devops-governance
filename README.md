@@ -7,7 +7,6 @@ This demo project deploys Azure resources and bootstraps Azure DevOps projects t
 | [![CD - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/continuous-deployment-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=34&branchName=deploy) | Deployment Azure Resources and Azure DevOps |
 | [![Detect Drift - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/detect-drift-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=35&branchName=deploy) | Detect Configuration Drift (scheduled nightly) |
 
-
 ### Table of Contents
 
 - #### [Concept - End to End Governance](./docs/README.md)
@@ -53,7 +52,7 @@ When run Terraform will create the following resources. Note: random suffix used
 
 ### Azure AD Groups
 
-Note: the `-all` groups are currently not in use but was introduced to fix a conceptual problem (see [#12](https://github.com/Azure/devops-governance/issues/12)):
+Note: the `-all` groups are currently not in use but was introduced to address a conceptual problem (see [#12](https://github.com/Azure/devops-governance/issues/12)):
 
 - Azure Resource Manager uses an [_additive_ permissions](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview#multiple-role-assignments) model
 - Azure DevOps uses a [_least_ permissions](https://docs.microsoft.com/en-us/azure/devops/organizations/security/about-permissions?view=azure-devops&tabs=preview-page) model
@@ -70,7 +69,7 @@ Note: the `-all` groups are currently not in use but was introduced to fix a con
 | `infra-devs` | Contributor | Contributor |
 | `infra-admins` | Owner | Project Administrators |
 
-In the future when we bootstrap the `supermarket` project, we will need all 3 categories of AAD groups.
+In the future when we bootstrap the `supermarket` project, we will need the `-all` groups as well.
 
 ### Azure DevOps Projects
 
@@ -109,7 +108,7 @@ Be aware that in practice per [Cloud Adoption Framework](https://docs.microsoft.
 
 # Contributing
 
-This demo was created with &hearts; by the FastTrack engineer [Julie Ng](https://github.com/julie-ng) and based on experience with Azure customers new to CI/CD and DevOps. After regularly breaking and fixing the demo in onboarding sessions, it was automated.
+This demo was created with &hearts; by the FastTrack engineer [Julie Ng](https://github.com/julie-ng) and based on previous experience as an Enterprise Architct and current experieince with Azure customers new to CI/CD and DevOps. After regularly breaking and fixing the demo in onboarding sessions, it was automated.
 
 Learn more about [FastTrack for Azure &rarr;](https://aka.ms/fasttrackforazure)
 
