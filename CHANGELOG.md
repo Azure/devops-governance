@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/Azure/devops-governance/compare/v0.1.0...v0.2.0) (2021-03-19)
+
+### Updates and Fixes
+
+* **concept:** update and newer end-to-end overview graphic ([ee1167a](https://github.com/Azure/devops-governance/commit/ee1167ad31dd920acbbf57c8ff6a1af14a6fc34d))
+* **permissions:** use admin aad group for project admins ([#7](https://github.com/Azure/devops-governance/issues/7)) ([c0bece4](https://github.com/Azure/devops-governance/commit/c0bece4eda56d7f353a78da05bee5c13244f1a94))
+* **roles:** introduce 3rd AAD group for total devs, admins, and all, [#12](https://github.com/Azure/devops-governance/issues/12) ([02524a6](https://github.com/Azure/devops-governance/commit/02524a6399c4e444b519aa1ab8b72e55c5081d0c))
+
 ## 0.1.0 (2020-12-02)
 
 
