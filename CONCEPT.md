@@ -10,7 +10,7 @@ When developing a governance model for your organization, it is important to rem
 
 By introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
 
-## Example Use Case, Business Requirements
+## Example Scenario, Business Requirements
 
 This demo is open source and intended to be used as a **Teaching Tool** for organizations who are new to DevOps and need to create a governance model for deploying to Azure. Please read this carefully to understand the decisions behind the model used in this sample repository. 
 
