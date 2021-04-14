@@ -8,7 +8,6 @@ local.auto.tfvars
 *.tfplan
 *.tfstate
 *.tfstate.*
-.terraform.lock.hcl
 
 # Debugging
 debug.azcli
