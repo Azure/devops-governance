@@ -10,18 +10,25 @@ This code is NOT meant to be used for production. While great efforts were taken
 
 If you have a [Visual Studio subscription](https://visualstudio.microsoft.com/subscriptions/), use that for this demo so that the elevated service principals required have NO access to your actual Azure environments.
 
-### Local vs Headless (CI/CD)
+### 1) Security Principals - User vs Service (CI/CD)
 
-If you want to deploy locally, you do NOT need a service principal. You still need owner permissions, but a simple `az login` is enough to deploy the resources.
+- **User Principal** 🙋‍♀️  
+  If you want to deploy locally, you do NOT need a service principal. You still need owner permissions, but a simple `az login` is enough to deploy the resources. 
+  [Further Instructions &rarr;](#from-local-computer-recommended)
 
-If you are using this project sample for its [Azure Pipelines](https://azure.microsoft.com/services/devops/pipelines/), you will also need to initiate an Azure Remote Backend.
+- **Headless Service Principal** 🤖  
+  If you are using this project sample for its [Azure Pipelines](https://azure.microsoft.com/services/devops/pipelines/), you will also need to initiate an Azure Remote Backend. [Further Instructions &rarr;](#configure-azure-backend-for-terraform-optional)
 
-### Azure Subscription
+For details, please read [Azure Security Principals](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) official documentation.
+
+### 2) Azure Subscription
 
 - **User or Service Principal**  
   with elevated `Owner` permissions, required to create Key Vault Access Policies
 
-### Azure Active Directory
+### 3) Azure Active Directory Tenant
+
+> ⚠️ Please consider carefully which Azure AD tenant you will use and read the Terraform documentation carefully about configuring the required elevated privileges.
 
 - **Azure AD Tenant**  
   If you have a non-production tenant, use it because the following service principal is very privileged. 
@@ -29,7 +36,7 @@ If you are using this project sample for its [Azure Pipelines](https://azure.mic
 - **User or Service Principal**   
   with elevated privileges so that it can manage Azure Active Directory. [Follow these steps per Terraform documentation](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration) to properly configure your Service Principal.
   
-### Azure DevOps
+### 4) Azure DevOps Organization
 
 - **DevOps Organization**  
   Create a [new organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops) just for this demo.
