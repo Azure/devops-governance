@@ -9,7 +9,7 @@ This demo project deploys Azure resources and bootstraps Azure DevOps projects t
 
 ### Table of Contents
 
-- #### [Concept - End to End Governance](./docs/README.md)
+- #### [Concept - End to End Governance](./README.md)
   - Use Case, Requirements
   - Azure AD Groups and Role Based Access Controls (RBAC)
   - Securing environments - Production vs Non-production
@@ -27,7 +27,7 @@ This demo project deploys Azure resources and bootstraps Azure DevOps projects t
 
 When developing a governance model for your organization, it is important to remember that Azure Resource Management (ARM) is only _one_ way to manage resources. 
 
-[![End to End Governance](./images/e2e-governance-overview.svg)](./docs/README.md)
+[![End to End Governance](./images/e2e-governance-overview.svg)](./CONCEPT.md)
 
 When introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
 
