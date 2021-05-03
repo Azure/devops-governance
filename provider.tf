@@ -1,5 +1,5 @@
 terraform {
-  # Store Terraform Stage in Azure Storage Account (see azure.conf.sample)
+  # Store Terraform Stage in Azure Storage Account (see backend.hcl.sample)
   backend "azurerm" {
   }
 
