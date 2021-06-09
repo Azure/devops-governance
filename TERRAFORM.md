@@ -30,12 +30,19 @@ For details, please read [Azure Security Principals](https://docs.microsoft.com/
 
 > ⚠️ Please consider carefully which Azure AD tenant you will use and read the Terraform documentation carefully about configuring the required elevated privileges.
 
-- **Azure AD Tenant**  
+- **Azure AD Tenant (non-production)**  
   If you have a non-production tenant, use it because the following service principal is very privileged. 
 
 - **User or Service Principal**   
   with elevated privileges so that it can manage Azure Active Directory. [Follow these steps per Terraform documentation](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration) to properly configure your Service Principal.
   
+- **Required Permissions on AD**  
+  - Directory Role: [Azure AD Provider on Terraform](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration#method-1-directory-roles-recommended) recommends assigning the `Global Administrator` role to the security principal (user or service) in order to manage users, groups and applications.
+  
+  - API Permissions: if instead of using a role, you can also add the grant access to the following permissions:
+    - `Application.ReadWrite.All`
+    - `Directory.ReadWrite.All`
+
 ### 4) Azure DevOps Organization
 
 - **DevOps Organization**  
@@ -99,7 +106,7 @@ It is preferred to use the Azure CLI. See [setup.azcli](./setup.azcli) for full 
 
 #### Configure Backend
 
-Create an `azure.conf` file, using `azure.conf.sample` as a template, filling in the placeholders iwth your values.
+Create an `backend.hcl` file, using `backend.hcl.sample` as a template, filling in the placeholders iwth your values. hcl stands for HashiCorp Language.
 
 ```
 storage_account_name="azurestorageaccountname"
@@ -111,7 +118,7 @@ sas_token="?sv=2019-12-12…"
 Finally run `init` with our new backend config. 
 
 ```
-terraform init -backend-config=./azure.conf
+terraform init -backend-config=./backend.hcl
 ```
 
 

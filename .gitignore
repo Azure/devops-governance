@@ -1,6 +1,7 @@
 # Configuration - never check in credentials!
 *.conf
 .env
+.env.dev
 local.auto.tfvars
 
 # Terraform - state and plan files
@@ -8,6 +9,7 @@ local.auto.tfvars
 *.tfplan
 *.tfstate
 *.tfstate.*
+*.backend.hcl
 
 # Debugging
 debug.azcli
