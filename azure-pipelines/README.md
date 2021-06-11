@@ -43,6 +43,7 @@ variables:
 steps:
 - bash: |    
     terraform init \
+      -backend=true \
       -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
       -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
       -backend-config="key=$TF_STATE_BLOB_FILE" \

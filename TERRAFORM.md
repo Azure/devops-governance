@@ -85,7 +85,7 @@ source ./.env
 Assuming you are logged in with `az login`, just run
 
 ```
-terraform init -backend=false
+terraform init 
 ```
 
 Then continue to [Create Deployment Plan &rarr;](##create-deployment-plan)
@@ -118,7 +118,7 @@ sas_token="?sv=2019-12-12…"
 Finally run `init` with our new backend config. 
 
 ```
-terraform init -backend-config=./backend.hcl
+terraform init -backend=true -backend-config=./backend.hcl
 ```
 
 

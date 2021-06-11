@@ -16,7 +16,7 @@ pool:
   vmImage: 'ubuntu-18.04'
 
 steps:
-- bash: terraform init -backend=false
+- bash: terraform init
   displayName: init
 
 - bash: terraform validate
