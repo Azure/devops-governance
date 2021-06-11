@@ -24,8 +24,13 @@ data "azuredevops_group" "contributors" {
 
 resource "azuredevops_group_membership" "team" {
   group = data.azuredevops_group.contributors.descriptor
+
   members = [
     azuredevops_group.team_group.descriptor
+  ]
+
+  depends_on = [
+    azuredevops_group.team_group
   ]
 }
 
@@ -42,7 +47,12 @@ data "azuredevops_group" "admins" {
 
 resource "azuredevops_group_membership" "admins" {
   group = data.azuredevops_group.admins.descriptor
+
   members = [
     azuredevops_group.admins_group.descriptor
+  ]
+
+  depends_on = [
+    azuredevops_group.admins_group
   ]
 }
