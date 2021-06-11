@@ -3,7 +3,7 @@ variable "name" {
   description = "Base name of your workspace that will be used in resource names. Please use lowercase with dashes."
 
   validation {
-    condition     = length(var.name) < 20
+    condition     = length(var.name) < 24
     error_message = "Name must be less than 20 characters."
   }
 }
@@ -14,12 +14,12 @@ variable "location" {
   default     = "westeurope"
 }
 
-variable "team_group_id" {
+variable "devs_group_id" {
   description = "AAD Group ID to receive 'Contributor' permissions"
   type        = string
 }
 
-variable "admin_group_id" {
+variable "admins_group_id" {
   description = "AAD Group ID to receive 'Owner' permissions"
   type        = string
 }
@@ -27,6 +27,11 @@ variable "admin_group_id" {
 variable "superadmins_group_id" {
   type        = string
   description = "Required: object ID of the AAD group for super admins, used to apply key vault access policies."
+}
+
+variable "service_principal_id" {
+  type        = string
+  description = "Required: Service Principal ID for build agent for this Resource Group to receive 'Contributor' permissions."
 }
 
 variable "client_tenant_id" {

@@ -1,4 +1,5 @@
-# RESOURCE GROUP
+# --------------
+# Resource Group
 # --------------
 
 resource "azurerm_resource_group" "workspace" {
@@ -7,7 +8,8 @@ resource "azurerm_resource_group" "workspace" {
   tags     = var.tags
 }
 
-# STORAGE ACCOUNT
+# ---------------
+# Storage Account
 # ---------------
 
 resource "azurerm_storage_account" "storage" {
@@ -20,7 +22,8 @@ resource "azurerm_storage_account" "storage" {
   tags                     = var.tags
 }
 
-# AZURE KEY VAULT
+# ---------------
+# Azure Key Vault
 # ---------------
 
 resource "azurerm_key_vault" "kv" {
@@ -33,102 +36,77 @@ resource "azurerm_key_vault" "kv" {
   purge_protection_enabled    = false # so we can fully delete it
   sku_name                    = "standard"
   tags                        = var.tags
+  enable_rbac_authorization   = true
 }
 
-# Key Vault Access Policy - superadmins
-# e.g. admins as well has limited infrastructure service principals
+# # ------------------
+# # Service Principals
+# # ------------------
 
-resource "azurerm_key_vault_access_policy" "superadmins" {
-  key_vault_id = azurerm_key_vault.kv.id
-  object_id    = var.superadmins_group_id
-  tenant_id    = local.client_tenant_id
+# module "workspace_sp" {
+#   source = "./../service-principal"
+#   name   = "${local.name}-sp"
+# }
 
-  secret_permissions = [
-    "backup",
-    "delete",
-    "get",
-    "list",
-    "purge",
-    "recover",
-    "restore",
-    "set"
-  ]
+# -----------------------
+# RBAC - Role Assignments
+# -----------------------
 
-  storage_permissions = [
-    "backup",
-    "delete",
-    "deletesas",
-    "get",
-    "getsas",
-    "list",
-    "listsas",
-    "purge",
-    "recover",
-    "regeneratekey",
-    "restore",
-    "set",
-    "setsas",
-    "update"
-  ]
+# Resource Group - Team Admins
+
+resource "azurerm_role_assignment" "rg_team_admins" {
+  role_definition_name = "Owner"
+  principal_id         = var.admins_group_id
+  scope                = azurerm_resource_group.workspace.id
 }
 
-# Key Vault Access Policy - workspace service principal
+# Resource Group - Team Devs
 
-data "azuread_service_principal" "workspace_sp" {
-  application_id = azuread_application.workspace_sp.application_id # "${var.sp_id}"
+resource "azurerm_role_assignment" "rg_team_devs" {
+  role_definition_name = "Contributor"
+  principal_id         = var.devs_group_id
+  scope                = azurerm_resource_group.workspace.id
 }
 
-resource "azurerm_key_vault_access_policy" "workspace_sp" {
-  key_vault_id = azurerm_key_vault.kv.id
-  object_id    = data.azuread_service_principal.workspace_sp.id
-  tenant_id    = local.client_tenant_id
+# Resource Group - Service Principal
 
-  secret_permissions = [
-    "backup",
-    "delete",
-    "get",
-    "list",
-    "purge",
-    "recover",
-    "restore",
-    "set"
-  ]
+resource "azurerm_role_assignment" "rg_sp" {
+  role_definition_name = "Contributor"
+  principal_id         = var.service_principal_id
+  scope                = azurerm_resource_group.workspace.id
 }
 
-# Key Vault Access Policy - Read-only e.g. for Azure DevOps
+# Key Vault - Superadmins (i.e. organization - top level admins)
 
-data "azuread_service_principal" "kv_reader_sp" {
-  application_id = azuread_application.kv_reader_sp.application_id # "${var.sp_id}"
+resource "azurerm_role_assignment" "kv_superadmins" {
+  role_definition_name = "Key Vault Administrator" # note: takes up to 10 minutes to propagate
+  principal_id         = var.superadmins_group_id
+  scope                = azurerm_key_vault.kv.id
 }
 
-resource "azurerm_key_vault_access_policy" "kv_reader" {
-  key_vault_id = azurerm_key_vault.kv.id
-  object_id    = data.azuread_service_principal.kv_reader_sp.id
-  tenant_id    = local.client_tenant_id
+# Key Vault - Team Admins
 
-  key_permissions = [
-    "get",
-  ]
-
-  secret_permissions = [
-    "get",
-  ]
+resource "azurerm_role_assignment" "kv_team_admins" {
+  role_definition_name = "Key Vault Administrator" # note: takes up to 10 minutes to propagate
+  principal_id         = var.admins_group_id
+  scope                = azurerm_key_vault.kv.id
 }
 
-# KEY VAULT SECRETS
-# -----------------
-# Examples and our service principal credentials
+# Key Vault - Devs
 
-resource "azurerm_key_vault_secret" "workspace_sp_secret" {
-  name         = "workspace-sp-secret"
-  value        = random_password.workspace_sp.result
-  key_vault_id = azurerm_key_vault.kv.id
-  tags         = var.tags
+resource "azurerm_role_assignment" "kv_team_devs" {
+  role_definition_name = "Key Vault Secrets User" # note: takes up to 10 minutes to propagate
+  principal_id         = var.devs_group_id
+  scope                = azurerm_key_vault.kv.id
 }
 
-resource "azurerm_key_vault_secret" "kv_reader_sp_secret" {
-  name         = "kv-reader-sp-secret"
-  value        = random_password.kv_reader_sp.result
-  key_vault_id = azurerm_key_vault.kv.id
-  tags         = var.tags
-}
+# # Key Vault - Service Principal (team should create own sps/rbac per app)
+
+# resource "azurerm_role_assignment" "kv_workspace_sp" {
+#   role_definition_name = "Key Vault Secrets User" # note: takes up to 10 minutes to propagate
+#   principal_id         = var.devs_group_id
+#   scope                = azurerm_key_vault.kv.id
+# }
+
+# Why does it take up to 10 minutes for Key Vault RBAC to propagate?
+# See https://docs.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli#known-limits-and-performance

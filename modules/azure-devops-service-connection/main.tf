@@ -1,39 +1,33 @@
-# 1 - get Service Principal secret from Key Vault
+# --------------------
+# Azure DevOps Project
+# --------------------
+# Determine project name based on resource group name:
+# - fruits-dev-*-rg    => project-fruits
+# - veggies-prod-*-rg  => project-veggies
+# - infra-shared-*-rg  => central-it
 
-data "azurerm_key_vault" "workspace" {
-  name                = var.key_vault_name
-  resource_group_name = var.resource_group_name
+locals {
+  project_name = split("-", var.resource_group_name)[0] == "infra" ? "central-it" : "project-${split("-", var.resource_group_name)[0]}"
 }
-
-data "azurerm_key_vault_secret" "sp_secret" {
-  name         = local.sp_secret_name
-  key_vault_id = data.azurerm_key_vault.workspace.id
-}
-
-# 2 - get reference to ADO Project
 
 data "azuredevops_project" "team" {
   name = local.project_name
 }
 
-# 3 -get Subscription Info
-
-data "azurerm_subscription" "current" {
-}
-
-data "azurerm_client_config" "current" {
-}
-
-# 4 - finally create Service Connection in ADO project
+# ------------------
+# Service Connection
+# ------------------
+data "azurerm_subscription" "current" {}
+data "azurerm_client_config" "current" {}
 
 resource "azuredevops_serviceendpoint_azurerm" "workspace_endpoint" {
-  project_id            = data.azuredevops_project.team.id
-  service_endpoint_name = local.connection_name
-  credentials {
-    serviceprincipalid  = var.service_principal_id
-    serviceprincipalkey = data.azurerm_key_vault_secret.sp_secret.value
-  }
+  service_endpoint_name     = "${var.resource_group_name}-connection"
+  project_id                = data.azuredevops_project.team.id
   azurerm_spn_tenantid      = data.azurerm_client_config.current.tenant_id
   azurerm_subscription_id   = data.azurerm_client_config.current.subscription_id
   azurerm_subscription_name = data.azurerm_subscription.current.display_name
+  credentials {
+    serviceprincipalid  = var.service_principal_id
+    serviceprincipalkey = var.service_principal_secret
+  }
 }

@@ -28,6 +28,31 @@ resource "azuread_group" "groups" {
   prevent_duplicate_names = true
 }
 
+# ------------------
+# Service Principals
+# ------------------
+
+# TODO: document use for CI only. Apps should use diff. SP per PILP
+
+module "service_principals" {
+  for_each = var.environments
+  source   = "./modules/service-principal"
+  name     = "${each.value.team}-${each.value.env}-${local.suffix}-ci-sp"
+}
+
+# ------------------------------
+# Resource Groups ("Workspaces")
+# ------------------------------
+
+module "arm_environments" {
+  for_each             = var.environments
+  source               = "./modules/azure-resources"
+  name                 = "${each.value.team}-${each.value.env}-${local.suffix}"
+  devs_group_id        = azuread_group.groups["${each.value.team}_devs"].id
+  admins_group_id      = azuread_group.groups["${each.value.team}_admins"].id
+  superadmins_group_id = local.superadmins_aad_object_id
+  service_principal_id = module.service_principals["${each.value.team}_${each.value.env}"].principal_id
+}
 
 # Azure DevOps
 # ------------
@@ -133,13 +158,19 @@ module "workspace" {
 }
 
 
-# Service Connections for ADO
-# ---------------------------
+# Service Connections
+# -------------------
 
 module "service_connections" {
-  for_each             = module.workspace
-  source               = "./modules/azure-devops-service-connection"
-  service_principal_id = each.value.service_principals[0].application_id
-  key_vault_name       = each.value.key_vault
-  resource_group_name  = each.value.resource_group_name
+  for_each                 = module.arm_environments
+  source                   = "./modules/azure-devops-service-connection"
+  service_principal_id     = module.service_principals[each.key].principal_id
+  service_principal_secret = module.service_principals[each.key].client_secret
+  resource_group_name      = "${replace(each.key, "_", "-")}-${local.suffix}-rg"
+
+  depends_on = [
+    azuread_group.groups,
+    module.arm_environments,
+    module.service_principals
+  ]
 }
