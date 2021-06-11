@@ -1,3 +1,4 @@
+# ---------------
 # Azure AD Groups
 # ---------------
 # Workspaces generally have 2 groups of actors, general
@@ -5,17 +6,18 @@
 # and admins who are granted "Owner" permissions.
 
 groups = {
-  fruits         = "fruits-all"
+  fruits_team    = "fruits-team"
   fruits_devs    = "fruits-devs"
   fruits_admins  = "fruits-admins"
-  veggies        = "veggies-all"
+  veggies_team   = "veggies-team"
   veggies_devs   = "veggies-devs"
   veggies_admins = "veggies-admins"
-  infra          = "infra"
+  infra_team     = "infra-team"
   infra_devs     = "infra-dev"
   infra_admins   = "infra-admins"
 }
 
+# ---------------------
 # Azure DevOps Projects
 # ---------------------
 
@@ -39,33 +41,34 @@ projects = {
   }
 }
 
-# Workspaces / Environments
-# -------------------------
+# ----------------
+# ARM Environments
+# ----------------
 # The keys can be referenced in outputs,
-# e.g. module.workspace["gov_shared"]. Suffixes are appended later.
+# e.g. module.workspace["shared"]. Suffixes are appended later.
 
 environments = {
-  fru_dev = {
+  fruits_dev = {
     env  = "dev"
     team = "fruits"
   }
 
-  fru_prod = {
+  fruits_prod = {
     env  = "prod"
     team = "fruits"
   }
 
-  veg_dev = {
+  veggies_dev = {
     env  = "dev"
     team = "veggies"
   }
 
-  veg_prod = {
+  veggies_prod = {
     env  = "prod"
     team = "veggies"
   }
 
-  shared = {
+  infra_shared = {
     env  = "shared"
     team = "infra"
   }
