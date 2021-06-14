@@ -7,33 +7,33 @@ This demo project deploys Azure resources and bootstraps Azure DevOps projects t
 | [![CD - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/continuous-deployment-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=34&branchName=deploy) | Deployment Azure Resources and Azure DevOps |
 | [![Detect Drift - Build Status](https://dev.azure.com/julie-msft/e2e-governance-demo/_apis/build/status/detect-drift-v2?branchName=deploy)](https://dev.azure.com/julie-msft/e2e-governance-demo/_build/latest?definitionId=35&branchName=deploy) | Detect Configuration Drift (scheduled nightly) |
 
-### Table of Contents
+### Contents
 
-- #### [Concept - End to End Governance](./README.md)
-  - Use Case, Requirements
-  - Azure AD Groups and Role Based Access Controls (RBAC)
-  - Securing environments - Production vs Non-production
-  - Multi-tiered Governance - Access Controls 
-  
-- #### [Deploy Example with Terraform](./TERRAFORM.md)
-  - Prerequisites
-    - Azure Resource Manager (ARM) - Service Principal
-    - Azure AD - Tenant, Service Principal 
-    - Azure DevOps - Organization, Personal Access Token (PAT)
-  - Setup and Install
-  - Deploy
+- [What is End to End Governance?](#what-is-end-to-end-governance)  
+- [Deploy Example with Terraform &rarr;](./DEPLOY.md)
+- [Understanding this demo](#understanding-this-demo)
 
-## Abstract - Did You Close the Security Backdoor?
+## What is End to End Governance?
 
 When developing a governance model for your organization, it is important to remember that Azure Resource Management (ARM) is only _one_ way to manage resources. 
 
-[![End to End Governance](./images/e2e-governance-overview.svg)](./CONCEPT.md)
+[![End to End Governance](./images/e2e-governance-overview.svg)](https://aka.ms/architecture-e2e-governance)
 
 When introducing automation via CI/CD pipelines, be aware that the Role Based Access Control (RBAC) model must be applied at **multiple layers**. This code sample deploys many of these layers and show how they can be configured together in a unified governance model. 
 
 In a nutshell, you can achieve this by leveraging Azure Active Directory and connecting all role assignments (both Azure DevOps _and_ ARM) to this single identity management plane.
 
-## How to Use this Demo
+### Official Documentation
+
+This repository features the code to deploy the infrastructure and bootstrap Azure DevOps. For more about the concept of end to end governance, please see:
+
+- [Azure Architecture Center - End-to-end governance in Azure when using CI/CD](https://aka.ms/architecture-e2e-governance)  
+  More technical documentation with step by step walkthrough of diagram above and how to leverage Azure AD as single identity provider for unified RBAC. 
+
+- [Cloud Adoption Framework - End-to-end governance from DevOps to Azure](https://aka.ms/caf-e2e-devops)  
+  Explains Role Assignments and the planning required for organizations in their cloud journey to create end to end governance.
+
+## Understanding this Demo
 
 The Terraform Infrastructure as Code in this repository will bootstrap various resources for you:
 
@@ -42,15 +42,17 @@ The Terraform Infrastructure as Code in this repository will bootstrap various r
 - Service Principals
 - Azure DevOps Projects incl. Service Connections, Security Group Assignments, etc.
 
-Preview of the Azure DevOps organization created by this code sample. Icons by [Smashicons](https://www.flaticon.com/authors/smashicons) not included.
-
-<img src="./images/ado-demo-home.png" alt="Preview of the Azure DevOps organization" width="600">
-
-#### Note: Random Generated Suffix
+#### Random Generated Suffix
 
 When run Terraform will create the following resources. Note: random suffix used to ensure globally unique names, e.g. `u6t7` but are omitted here for clarity.
 
 ### Azure AD Groups
+
+The key to end to end governance is to have _multiple_ role assignments (with different role definitions and different resource scopes to the same Azure AD groups) as illustrated below. 
+
+To understand the benefits, imagine if you had to remove a contractor after completion of a project. If you use the concept described in this project and in the accompanying [official Microsoft documentation](https://aka.ms/architecture-e2e-governance), you can remove their access from multiple environments and resources simply by removing their membership to AAD group(s).
+
+[![Multiple Role Assignments](./images/2021-06-role-assignments.svg)](https://aka.ms/caf-e2e-devops)
 
 Note: the `-all` groups are currently not in use but was introduced to address a conceptual problem (see [#12](https://github.com/Azure/devops-governance/issues/12)):
 
@@ -74,6 +76,10 @@ In the future when we bootstrap the `supermarket` project, we will need the `-al
 ### Azure DevOps Projects
 
 The project structure illustrates different governance models and their trade-offs. 
+
+<img src="./images/ado-demo-home.png" alt="Preview of the Azure DevOps organization" width="600">
+
+_Screenshot of the Azure DevOps organization created by this code sample. Icons by [Smashicons](https://www.flaticon.com/authors/smashicons) not included._
 
 - "fruits" and "veggies" when isolated means less governance management - at the cost of less collaboration. 
 - "supermarket" model prioritizes collaboration via shared Azure Boards - but requires more governance management, especially for repositories and pipelines.
