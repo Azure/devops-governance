@@ -39,9 +39,9 @@ resource "azurerm_key_vault" "kv" {
   enable_rbac_authorization   = true
 }
 
-# # ------------------
-# # Service Principals
-# # ------------------
+# ------------------
+# Service Principals
+# ------------------
 
 # module "workspace_sp" {
 #   source = "./../service-principal"
