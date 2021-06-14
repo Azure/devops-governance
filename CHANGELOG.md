@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/Azure/devops-governance/compare/v0.2.0...v0.3.0) (2021-06-14)
+
+
+### Features
+
+* **concept:** remove drafts, link to now published official AAC and CAF docs, closes [#24](https://github.com/Azure/devops-governance/issues/24) ([d2f14b2](https://github.com/Azure/devops-governance/commit/d2f14b2882c2cb1deeefd22d642a1f2ebd25c2a6))
+* **docs-terraform:** update for clarity ([16cd300](https://github.com/Azure/devops-governance/commit/16cd3009649c23a048d43516ce7155376961560d))
+* **naming:** clean up variable name and output schema, improve conventions ([fcff295](https://github.com/Azure/devops-governance/commit/fcff295a57bbe9a17f4b116771eeaa2be2311a3c))
+* **terraform:** default to local backend for lower barrier to entry ([2a2ab95](https://github.com/Azure/devops-governance/commit/2a2ab950941dabdca29c9909d7fd6092e64d46e3))
+* **terraform:** simplify for single plan and deploy, use Key Vault RBAC instead of access policies [#22](https://github.com/Azure/devops-governance/issues/22) ([c2d3d95](https://github.com/Azure/devops-governance/commit/c2d3d9570e7aa7d2d7cc37fa0ba412a33709d050))
+
+
+### Bug Fixes
+
+* ado permissions errors by specifying dependency, closes [#24](https://github.com/Azure/devops-governance/issues/24) ([f4c68eb](https://github.com/Azure/devops-governance/commit/f4c68ebee224481fbb120d8e7cdf2a3d491aeaf5))
+
 ## [0.2.0](https://github.com/Azure/devops-governance/compare/v0.1.0...v0.2.0) (2021-03-19)
 
 ### Updates and Fixes
