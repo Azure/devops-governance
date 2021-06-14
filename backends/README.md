@@ -23,6 +23,14 @@ And to comply with governance best practices, we have 2 different storage accoun
 ![RBAC'd State Management](./../images/tf-state-rbac.svg)
 
 
+| Step in Azure Portal | [Azure CLI](./setup.azcli)|
+|:--|:--|
+| [Create a storage account*](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal) | `az storage account create …`  |
+| [Create Blob container](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction#containers) | `az storage container create …` |
+| [Generate SAS token](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature) for this storage account | `az storage account generate-sas …` | 
+
+*Don't forget to [disable public read access](https://docs.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-configure?tabs=portal) - otherwise everyone can read your credentials!
+
 ### Setup
 
 Copy `backend.hcl.sample` to for example, `dev.backend.hcl` and edit the contents to point to your storage account and state file.
