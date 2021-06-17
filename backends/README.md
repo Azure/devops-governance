@@ -34,7 +34,7 @@ To get started, create a new file, for example `dev.backend.hcl` and copy the co
 When you initialize the Terraform project, you can specify which backend configuration should be used, for example to target or **development** setup:
 
 ```bash
-terraform init -backend=true -backend-config=dev.backend.hcl
+terraform init -backend-config=dev.backend.hcl
 ```
 
 ### Toggling Different Backends

@@ -32,7 +32,7 @@ Make sure you read the full document because the pre-configuration of permission
 ```bash
 export AZDO_ORG_SERVICE_URL="https://dev.azure.com/<your-demo-org-name>"
 export AZDO_PERSONAL_ACCESS_TOKEN="…"
-terraform init
+terraform init -backend=false
 terraform plan -out demo.tfplan
 terraform apply demo.tfplan
 ```
@@ -116,7 +116,7 @@ source ./.env
 Assuming you are logged in with `az login`, just run
 
 ```
-terraform init 
+terraform init -backend=false
 ```
 
 Then continue to [Create Deployment Plan &rarr;](##create-deployment-plan)
@@ -139,7 +139,7 @@ sas_token="?sv=2019-12-12…"
 Finally run `init` with our new backend config. 
 
 ```
-terraform init -backend=true -backend-config=./backend.hcl
+terraform init -backend-config=./backend.hcl
 ```
 
 

@@ -28,7 +28,7 @@ stages:
     - bash: terraform version
       displayName: terraform version
 
-    - bash: terraform init
+    - bash: terraform init -backend=false
       displayName: terraform init
 
     - bash: |
