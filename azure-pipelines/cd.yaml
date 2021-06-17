@@ -4,11 +4,14 @@ name: $(BuildID)
 trigger:
   branches:
     include:
-    - deploy
+    - main
+    - production
   paths:
     exclude:
     - '*.md'
+    - 'backends/*'
     - 'images/*'
+    - '.github/*'
 
 pr: none
 
@@ -16,7 +19,7 @@ pool:
   vmImage: 'ubuntu-18.04'
 
 variables:
-  - group: e2e-gov-demo-kv
+  - template: vars.yaml
 
 stages:
 - stage: ci_stage
@@ -38,13 +41,17 @@ stages:
 
 - stage: cd_stage
   displayName: CD Stage
+  variables:
+  - ${{ if eq(variables.isMain, 'True') }}:
+    - group: e2e-gov-demo-dev-kv
+  - ${{ if eq(variables.isProduction, 'True') }}:
+    - group: e2e-gov-demo-kv
   jobs:
   - job: deploy
     displayName: Terraform Plan and Apply
     steps:
     - bash: |
         terraform init \
-          -backend=true \
           -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
           -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
           -backend-config="key=$TF_STATE_BLOB_FILE" \

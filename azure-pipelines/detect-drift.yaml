@@ -8,9 +8,11 @@ trigger:
   branches:
     include:
     - main
+    - production
 
 pr:
-- deploy
+- main
+- production
 
 schedules:
   - cron: "0 0 * * *"
@@ -21,7 +23,7 @@ schedules:
       - deploy
 
 variables:
-  - group: e2e-gov-demo-kv
+  - template: vars.yaml
 
 stages:
 
@@ -29,10 +31,18 @@ stages:
 # ---------------------
 - stage: terraformStage
   displayName: Detect Drift
+  condition: eq(variables.isFork, 'False') # only people with write access to repo are allowed to check drift
+  variables:
+  - ${{ if eq(variables.isMain, 'True') }}:
+    - group: e2e-gov-demo-dev-kv
+  - ${{ if eq(variables.isProduction, 'True') }}:
+    - group: e2e-gov-demo-kv
   jobs:
   - job: terraformJob
     displayName: Terraform Plan
     steps:
+    - bash: terraform -version
+      displayName: Terraform - output version
 
     # Step - terraform init
     - bash: |
@@ -80,15 +90,15 @@ stages:
     # Step - pass `terraform plan` output to downstream jobs
     - publish: ./plan-output.txt
       artifact: terraformPlanOutput
-      displayName: Publish 'terraform plan' output
+      displayName: Save 'terraform plan' output
       condition: always()
 
 
 # Stage: Pull Request Comment
 # ---------------------------
 - stage: pullRequestCommentStage
-  displayName: Drift Status
-  condition: and(succeededOrFailed(), eq(variables['Build.Reason'], 'PullRequest'))
+  displayName: Post Drift Status to PR
+  condition: and(succeededOrFailed(), eq(variables.isPR, 'True'))
   variables:
     githubRepoName:       Azure/devops-governance
     githubConnectionName: e2e-governance-demo
@@ -104,7 +114,7 @@ stages:
 
     # Step - post, No Drift
     - task: GitHubComment@0
-      condition: eq(variables['exitCode'], 'zero')
+      condition: eq(variables.exitCode, 'zero')
       displayName: Post - No Drift
       inputs:
         gitHubConnection: ${{ variables.githubConnectionName }}
@@ -116,7 +126,7 @@ stages:
 
     # Step - post, Drift detected
     - task: GitHubComment@0
-      condition: eq(variables['exitCode'], 'non-zero')
+      condition: eq(variables.exitCode, 'non-zero')
       displayName: Post - Has Drift
       inputs:
         gitHubConnection: ${{ variables.githubConnectionName }}
