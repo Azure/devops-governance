@@ -17,7 +17,7 @@ stages:
           -backend-config="key=$TF_STATE_BLOB_FILE" \
           -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
       displayName: Terraform - Init
-      condition: eq(variables.isProduction, 'True') # never / Debugging
+      # condition: eq(variables.isProduction, 'True') # never / Debugging
       env:
         TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
         TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
@@ -43,7 +43,7 @@ stages:
           exit $tf_exit_code
         fi
       displayName: Terraform - Detect configuration drift
-      condition: eq(variables.isProduction, 'True') # never / Debugging
+      # condition: eq(variables.isProduction, 'True') # never / Debugging
       name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
