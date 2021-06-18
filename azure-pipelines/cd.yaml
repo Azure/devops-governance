@@ -19,6 +19,10 @@ pool:
 
 variables:
   - template: vars/global.yaml
+  - ${{ if eq(variables.isMain, 'True') }}:
+    - group: e2e-gov-demo-dev-kv
+  - ${{ if eq(variables.isProduction, 'True') }}:
+    - group: e2e-gov-demo-kv
 
 stages:
 - template: templates/ci.yaml

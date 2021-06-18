@@ -1,11 +1,6 @@
 stages:
 - stage: cd_stage
   displayName: CD Stage
-  variables:
-  - ${{ if eq(variables.isMain, 'True') }}:
-    - group: e2e-gov-demo-dev-kv
-  - ${{ if eq(variables.isProduction, 'True') }}:
-    - group: e2e-gov-demo-kv
   jobs:
   - job: deploy
     displayName: Terraform Plan and Apply

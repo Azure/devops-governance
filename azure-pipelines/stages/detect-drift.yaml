@@ -99,7 +99,7 @@ stages:
         gitHubConnection: ${{ variables.githubConnectionName }}
         repositoryName: $(githubRepoName)
         comment: |
-          ### ⚠️ &nbsp;Configuration Drift Detected
+          ### ⚠️ &nbsp;Configuration Drift Detected (_OR_ State File Locked)
 
           Source Version: $(Build.SourceVersion)
 
@@ -108,7 +108,6 @@ stages:
           Proceed with caution!
 
   # Debugging - Work in progress
-
   - job: debugOutput
     displayName: Debug Output
     steps:
