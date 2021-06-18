@@ -36,14 +36,30 @@ stages:
   variables:
   - ${{ if or(eq(variables.isMain, 'True'), eq(variables.isPullRequestToMain, 'True')) }}:
     - group: e2e-gov-demo-dev-kv
+    - name: testing
+      value: "123-dev"
   - ${{ if or(eq(variables.isProduction, 'True'), eq(variables.isPullRequestToProd, 'True')) }}:
     - group: e2e-gov-demo-kv
+    - name: testing
+      value: "456-prod"
   jobs:
   - job: terraformJob
     displayName: Terraform Plan
     steps:
-    - bash: terraform -version
-      displayName: Terraform - output version
+    - bash: |
+        terraform -version
+      displayName: Terraform - which version?
+
+    - bash: |
+        echo "testing $(testing)"
+      display: debug conditional vars
+
+      # probably shouldn't even output since it's a secret
+    - bash: |
+        echo "AZDO_ORG_SERVICE_URL: $AZDO_ORG_SERVICE_URL"
+      displayName: Debug - which environment?
+      env:
+        AZDO_ORG_SERVICE_URL: $(kv-azure-devops-org-url)
 
     # Step - terraform init
     - bash: |
@@ -53,6 +69,7 @@ stages:
           -backend-config="key=$TF_STATE_BLOB_FILE" \
           -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
       displayName: Terraform - Init
+      condition: eq(variables.isProduction, 'True') # never / Debugging
       env:
         TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
         TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
@@ -78,6 +95,7 @@ stages:
           exit $tf_exit_code
         fi
       displayName: Terraform - Detect configuration drift
+      condition: eq(variables.isProduction, 'True') # never / Debugging
       name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
@@ -92,7 +110,7 @@ stages:
     - publish: ./plan-output.txt
       artifact: terraformPlanOutput
       displayName: Save 'terraform plan' output
-      condition: always()
+      condition: succeededOrFailed()
 
 
 # Stage: Pull Request Comment
