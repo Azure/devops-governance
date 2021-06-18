@@ -2,15 +2,33 @@
 
 Brief notes and considerations when automating infrastructure with [Terraform](https://terraform.io) and [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/).
 
-### Pipeline Overview
+## Overview
 
-| Pipeline | Triggers | Terraform Backend | Detect Drift | Deploys |
+### Branch Commit Triggered
+
+| Pipeline | Branch | Terraform Backend | Detects Drift | Deploys |
 |:--|:--|:--|:--|:--|
-| [`ci.yaml`](./ci.yaml) | &bull; `main` branch<br>&bull; `dev` branch<br>&bull; `feat/*` branch<br>&bull; `fix/*` branch<br>&bull; Pull Requests to `main`  | local/none | No | No |
-| [`detect-drift.yaml`](./detect-drift.yaml) | &bull; `main` branch<br>&bull; Pull Requests to `release`<br>&bull; Scheduled nightly | Azure Storage | Yes | No |
-| [`cd.yaml`](./cd.yaml) | &bull; `release` branch | Azure Storage | No* | Yes  |
+| [`ci.yaml`](./ci.yaml) | &bull; `main`<br>&bull; `feat/*`<br>&bull; `fix/*`  | local | No | No |
+| [`cd.yaml`](./cd.yaml) | &bull; `main` <br>&bull; `production` | Azure Storage | No* | Yes  |
 
-*The CD pipeline does not check for drift because this is checked at the pull request.
+_*The CD pipeline does not check for drift because this is checked at the pull request._
+
+### Pull Request Triggered
+
+The following pipelines do CI check and configuration drift detection, and posts the results back to the Pull Request. [See example &rarr;](https://github.com/Azure/devops-governance/pull/27)
+
+| Pipeline | PR Trigger  | Detects Drift | Deploys |
+|:--|:--|:--|:--|
+| [`pr-main.yaml`](./pr-main.yaml) | `main` | Yes | No |
+| [`pr-production.yaml`](./pr-production.yaml) | `production` | Yes | No |
+
+### Scheduled Triggeed
+
+Checks regularly for any manual non Infrastructure as Code changes.
+
+| Pipeline | Trigger  | Detects Drift | Deploys |
+|:--|:--|:--|:--|
+| [`schedule-drift.yaml`](./schedule-drift.yaml) | Scheduled nightly | Yes | No |
 
 ## Security Considerations
 
@@ -61,6 +79,4 @@ In this example "superadmins" refers to privileged accounts at the organization 
 
 This project creates Azure Key Vaults, which require access policies for the Data Plane. This means you want to create the Key Vault _and_ give yourself access. 
 
-If our CI/CD agent creates the Key Vault, it can assign itself access. But what if we as an infrastructure administrator also want access? If you give yourself access _outside of Terraform_, it can create **configuration drift** that conflicts with Terraform state. Using [Access Policies](https://docs.microsoft.com/en-us/azure/key-vault/general/secure-your-key-vault#data-plane-and-access-policies), you can [assign the Access Policy to an Azure AD group](https://docs.microsoft.com/en-us/azure/key-vault/general/overview-security#identity-and-access-management) instead of an account (service principal or user principal). 
-
-N.B. This is not relevant if you use the [Azure RBAC model for Azure Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/rbac-guide). At time of this writing (November 2020), this feature is still in preview, which is why this project uses access policies.
+In order to interact with the Key Vaults' data plane, the we need to [assign ourselves the proper roles](https://docs.microsoft.com/azure/key-vault/general/rbac-guide?tabs=azure-cli#azure-built-in-roles-for-key-vault-data-plane-operations), e.g. `Key Vault Secrets User` to gain access.
