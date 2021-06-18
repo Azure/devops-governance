@@ -37,7 +37,7 @@ stages:
         echo "Pull Request to ${{ variables['System.PullRequest.TargetBranch'] }}"
         echo "variables.isMain: ${{ variables.isMain }}"
         echo "variables.isPullRequestToMain: ${{ variables.isPullRequestToMain }}"
-      displayName: output variables
+      displayName: Debug variables
 
 # Stage: Terraform Plan
 # ---------------------
