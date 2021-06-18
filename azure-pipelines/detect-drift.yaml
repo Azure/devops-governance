@@ -97,7 +97,7 @@ stages:
 # Stage: Pull Request Comment
 # ---------------------------
 - stage: pullRequestCommentStage
-  displayName: Post Drift Status to PR
+  displayName: Add Results to Pull Request
   condition: and(succeededOrFailed(), eq(variables.isPR, 'True'))
   variables:
     githubRepoName:       Azure/devops-governance
