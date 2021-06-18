@@ -1,0 +1,23 @@
+name: $(BuildID)
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+schedules:
+  - cron: "0 0 * * *"
+    displayName: Daily midnight build
+    always: true
+    branches:
+      include:
+      - main
+      - production
+
+variables:
+  - template: vars/global.yaml
+  - ${{ if eq(variables.isMain, 'True') }}:
+    - group: e2e-gov-demo-dev-kv
+  - ${{ if eq(variables.isProduction, 'True') }}:
+    - group: e2e-gov-demo-kv
+
+stages:
+  - template: stages/detect-drift.yaml

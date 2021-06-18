@@ -1,26 +1,15 @@
-# Build numbering format
 name: $(BuildID)
 
 trigger:
   branches:
     include:
-    - main
     - dev
+    - main
     - feat/*
     - fix/*
-
-pr:
-- main
 
 pool:
   vmImage: 'ubuntu-18.04'
 
-steps:
-- bash: terraform init -backend=false
-  displayName: init
-
-- bash: terraform validate
-  displayName: validate
-
-- bash: terraform fmt -check
-  displayName: check format / lint
+stages:
+- template: stages/ci.yaml

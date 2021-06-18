@@ -1,0 +1,18 @@
+stages:
+- stage: CIStage
+  displayName: CI
+  jobs:
+  - job: CIJob
+    displayName: Terraform - Lint and Validate
+    steps:
+    - bash: terraform -version
+      displayName: version
+
+    - bash: terraform init -backend=false
+      displayName: init
+
+    - bash: terraform validate
+      displayName: validate
+
+    - bash: terraform fmt -check
+      displayName: check format / lint

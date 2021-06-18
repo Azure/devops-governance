@@ -1,79 +1,16 @@
-# Build numbering format
-name: $(BuildID)
-
-pool:
-  vmImage: 'ubuntu-18.04'
-
-trigger:
-  branches:
-    include:
-    - main
-    - production
-
-pr:
-- main
-- production
-
-schedules:
-  - cron: "0 0 * * *"
-    displayName: Daily midnight build
-    always: true
-    branches:
-      include:
-      - main
-      - production
-
-variables:
-  - template: vars.yaml
-
 stages:
-- stage: debuggingStage
-  displayName: Output variables
-  jobs:
-  - job: outputVarsJob
-    steps:
-    - bash: |
-        echo "Source Branch ${{ variables['Build.SourceBranch'] }}"
-        echo "Pull Request to ${{ variables['System.PullRequest.TargetBranch'] }}"
-        echo "variables.isMain: ${{ variables.isMain }}"
-        echo "variables.isPullRequestToMain: ${{ variables.isPullRequestToMain }}"
-      displayName: Debug variables
 
 # Stage: Terraform Plan
 # ---------------------
 - stage: terraformStage
   displayName: Detect Drift
-  condition: eq(variables.isTrustedCode, 'True')
-  variables:
-  - ${{ if eq(variables.isPullRequestToMain, 'True') }}:
-    - group: e2e-gov-demo-dev-kv
-    - name: testing
-      value: "123-dev"
-  - ${{ if or(eq(variables.isProduction, 'True'), eq(variables.isPullRequestToProd, 'True')) }}:
-    - group: e2e-gov-demo-kv
-    - name: testing
-      value: "456-prod"
   jobs:
   - job: terraformJob
     displayName: Terraform Plan
     steps:
-    - bash: |
-        terraform -version
-      displayName: Terraform - which version?
-
-    - bash: |
-        echo "testing $(testing)"
-      displayName: debug conditional vars
-
-      # probably shouldn't even output since it's a secret
-    - bash: |
-        echo "AZDO_ORG_SERVICE_URL: $AZDO_ORG_SERVICE_URL"
-      displayName: Debug - which environment?
-      env:
-        AZDO_ORG_SERVICE_URL: $(kv-azure-devops-org-url)
-
     # Step - terraform init
     - bash: |
+        terraform -version
         terraform init \
           -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
           -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
@@ -94,7 +31,7 @@ stages:
 
         # Run `terraform plan` and save output (used later for posting to GitHub)
         if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
-            | tee plan-output.txt \
+            | tee ${{ variables.planOutputFile }} \
             exit ${PIPESTATUS[0]}
         then
           echo "🟢 No configuration drift detected"
