@@ -27,6 +27,17 @@ variables:
   - template: vars.yaml
 
 stages:
+- stage: debuggingStage
+  displayName: Output variables
+  jobs:
+  - job: outputVarsJob
+    steps:
+    - bash: |
+        echo "Source Branch ${{ variables['Build.SourceBranch'] }}"
+        echo "Pull Request to ${{ variables['System.PullRequest.TargetBranch'] }}"
+        echo "variables.isMain: ${{ variables.isMain }}"
+        echo "variables.isPullRequestToMain: ${{ variables.isPullRequestToMain }}"
+      displayName: output variables
 
 # Stage: Terraform Plan
 # ---------------------
@@ -34,7 +45,7 @@ stages:
   displayName: Detect Drift
   condition: eq(variables.isTrustedCode, 'True')
   variables:
-  - ${{ if or(eq(variables.isMain, 'True'), eq(variables.isPullRequestToMain, 'True')) }}:
+  - ${{ if eq(variables.isPullRequestToMain, 'True') }}:
     - group: e2e-gov-demo-dev-kv
     - name: testing
       value: "123-dev"
