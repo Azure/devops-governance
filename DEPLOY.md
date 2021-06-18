@@ -32,7 +32,7 @@ Make sure you read the full document because the pre-configuration of permission
 ```bash
 export AZDO_ORG_SERVICE_URL="https://dev.azure.com/<your-demo-org-name>"
 export AZDO_PERSONAL_ACCESS_TOKEN="…"
-terraform init
+terraform init -backend=false
 terraform plan -out demo.tfplan
 terraform apply demo.tfplan
 ```
@@ -70,9 +70,11 @@ For details, please read [Azure Security Principals](https://docs.microsoft.com/
 - **Required Permissions on AD**  
   - Directory Role: [Azure AD Provider on Terraform](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration#method-1-directory-roles-recommended) recommends assigning the `Global Administrator` role to the security principal (user or service) in order to manage users, groups and applications.
   
-  - API Permissions: if instead of using a role, you can also add the grant access to the following permissions:
+  - API Permissions: if instead of using a role, you can also add the grant access to the following permissions for **_Azure Active Directory Graph API_**, _not_ the Microsoft Graph API:
     - `Application.ReadWrite.All`
     - `Directory.ReadWrite.All`
+
+    See [Terraform documentation](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration#method-1-directory-roles-recommended) on configuring service principals for full instructions.
 
 ### 4) Azure DevOps Organization
 
@@ -116,7 +118,7 @@ source ./.env
 Assuming you are logged in with `az login`, just run
 
 ```
-terraform init 
+terraform init -backend=false
 ```
 
 Then continue to [Create Deployment Plan &rarr;](##create-deployment-plan)
@@ -139,7 +141,7 @@ sas_token="?sv=2019-12-12…"
 Finally run `init` with our new backend config. 
 
 ```
-terraform init -backend=true -backend-config=./backend.hcl
+terraform init -backend-config=./backend.hcl
 ```
 
 

@@ -1,28 +1,3 @@
-# Build numbering format
-name: $(BuildID)
-
-pool:
-  vmImage: 'ubuntu-18.04'
-
-trigger:
-  branches:
-    include:
-    - main
-
-pr:
-- deploy
-
-schedules:
-  - cron: "0 0 * * *"
-    displayName: Daily midnight build
-    always: true
-    branches:
-      include:
-      - deploy
-
-variables:
-  - group: e2e-gov-demo-kv
-
 stages:
 
 # Stage: Terraform Plan
@@ -33,16 +8,16 @@ stages:
   - job: terraformJob
     displayName: Terraform Plan
     steps:
-
     # Step - terraform init
     - bash: |
+        terraform -version
         terraform init \
-          -backend=true \
           -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
           -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
           -backend-config="key=$TF_STATE_BLOB_FILE" \
           -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
       displayName: Terraform - Init
+      # condition: eq(variables.isProduction, 'True') # never / Debugging
       env:
         TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
         TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
@@ -68,6 +43,7 @@ stages:
           exit $tf_exit_code
         fi
       displayName: Terraform - Detect configuration drift
+      # condition: eq(variables.isProduction, 'True') # never / Debugging
       name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
@@ -81,15 +57,15 @@ stages:
     # Step - pass `terraform plan` output to downstream jobs
     - publish: ./plan-output.txt
       artifact: terraformPlanOutput
-      displayName: Publish 'terraform plan' output
-      condition: always()
+      displayName: Save 'terraform plan' output
+      condition: succeededOrFailed()
 
 
 # Stage: Pull Request Comment
 # ---------------------------
 - stage: pullRequestCommentStage
-  displayName: Drift Status
-  condition: and(succeededOrFailed(), eq(variables['Build.Reason'], 'PullRequest'))
+  displayName: Add Results to Pull Request
+  condition: and(succeededOrFailed(), eq(variables.isPR, 'True'))
   variables:
     githubRepoName:       Azure/devops-governance
     githubConnectionName: e2e-governance-demo
@@ -105,7 +81,7 @@ stages:
 
     # Step - post, No Drift
     - task: GitHubComment@0
-      condition: eq(variables['exitCode'], 'zero')
+      condition: eq(variables.exitCode, 'zero')
       displayName: Post - No Drift
       inputs:
         gitHubConnection: ${{ variables.githubConnectionName }}
@@ -117,13 +93,13 @@ stages:
 
     # Step - post, Drift detected
     - task: GitHubComment@0
-      condition: eq(variables['exitCode'], 'non-zero')
+      condition: eq(variables.exitCode, 'non-zero')
       displayName: Post - Has Drift
       inputs:
         gitHubConnection: ${{ variables.githubConnectionName }}
         repositoryName: $(githubRepoName)
         comment: |
-          ### ⚠️ &nbsp;Configuration Drift Detected
+          ### ⚠️ &nbsp;Configuration Drift Detected (_OR_ State File Locked)
 
           Source Version: $(Build.SourceVersion)
 
@@ -132,7 +108,6 @@ stages:
           Proceed with caution!
 
   # Debugging - Work in progress
-
   - job: debugOutput
     displayName: Debug Output
     steps:

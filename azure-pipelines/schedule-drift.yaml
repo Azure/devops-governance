@@ -1,21 +1,16 @@
 name: $(BuildID)
 
-trigger:
-  branches:
-    include:
-    - main
-    - production
-  paths:
-    exclude:
-    - '*.md'
-    - 'backends/*'
-    - 'images/*'
-    - '.github/*'
-
-pr: none
-
 pool:
   vmImage: 'ubuntu-18.04'
+
+schedules:
+  - cron: "0 0 * * *"
+    displayName: Daily midnight build
+    always: true
+    branches:
+      include:
+      - main
+      - production
 
 variables:
   - template: vars/global.yaml
@@ -25,5 +20,4 @@ variables:
     - group: e2e-gov-demo-kv
 
 stages:
-- template: templates/ci.yaml
-- template: templates/deploy.yaml
+  - template: stages/detect-drift.yaml

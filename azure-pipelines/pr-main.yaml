@@ -1,0 +1,17 @@
+name: $(BuildID)
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+trigger: none # PR only
+
+pr:
+- main
+
+variables:
+  - template: vars/global.yaml
+  - group: e2e-gov-demo-dev-kv # DEV
+
+stages:
+  - template: stages/ci.yaml
+  - template: stages/detect-drift.yaml
