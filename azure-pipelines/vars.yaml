@@ -7,5 +7,5 @@ variables:
   isTrustedCode:       ${{ eq(variables.isFork, 'False') }}
   isScheduled:         ${{ eq(variables['Build.Reason'], 'Schedule') }}
   isTrustedCI:         ${{ and( eq(variables.isFork,'False'), eq(variables.isPR,'False'), eq(variables.isScheduled,'False') ) }}
-  isPullRequestToMain: ${{ and( eq(variables['System.PullRequest.TargetBranch'], 'main'), eq(variables.isFork, 'False') ) }}
-  isPullRequestToProd: ${{ and( eq(variables['System.PullRequest.TargetBranch'], 'production'), eq(variables.isFork, 'False') ) }}
+  isPullRequestToMain: ${{ and( eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main'), eq(variables.isFork, 'False') ) }}
+  isPullRequestToProd: ${{ and( eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/production'), eq(variables.isFork, 'False') ) }}
