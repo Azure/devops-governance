@@ -20,7 +20,8 @@ schedules:
     always: true
     branches:
       include:
-      - deploy
+      - main
+      - production
 
 variables:
   - template: vars.yaml
@@ -31,11 +32,11 @@ stages:
 # ---------------------
 - stage: terraformStage
   displayName: Detect Drift
-  condition: eq(variables.isFork, 'False') # only people with write access to repo are allowed to check drift
+  condition: eq(variables.isTrustedCode, 'True')
   variables:
-  - ${{ if eq(variables.isMain, 'True') }}:
+  - ${{ if or(eq(variables.isMain, 'True'), eq(variables.isPullRequestToMain, 'True')) }}:
     - group: e2e-gov-demo-dev-kv
-  - ${{ if eq(variables.isProduction, 'True') }}:
+  - ${{ if or(eq(variables.isProduction, 'True'), eq(variables.isPullRequestToProd, 'True')) }}:
     - group: e2e-gov-demo-kv
   jobs:
   - job: terraformJob
