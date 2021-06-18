@@ -3,6 +3,8 @@ name: $(BuildID)
 pool:
   vmImage: 'ubuntu-18.04'
 
+trigger: none # PR only
+
 pr:
 - production
 
