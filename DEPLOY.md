@@ -70,9 +70,11 @@ For details, please read [Azure Security Principals](https://docs.microsoft.com/
 - **Required Permissions on AD**  
   - Directory Role: [Azure AD Provider on Terraform](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration#method-1-directory-roles-recommended) recommends assigning the `Global Administrator` role to the security principal (user or service) in order to manage users, groups and applications.
   
-  - API Permissions: if instead of using a role, you can also add the grant access to the following permissions:
+  - API Permissions: if instead of using a role, you can also add the grant access to the following permissions for **_Azure Active Directory Graph API_**, _not_ the Microsoft Graph API:
     - `Application.ReadWrite.All`
     - `Directory.ReadWrite.All`
+
+    See [Terraform documentation](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/service_principal_configuration#method-1-directory-roles-recommended) on configuring service principals for full instructions.
 
 ### 4) Azure DevOps Organization
 
