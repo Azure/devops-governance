@@ -7,6 +7,12 @@ trigger:
     - main
     - feat/*
     - fix/*
+  paths:
+    exclude:
+    - '*.md'
+    - 'backends/*'
+    - 'images/*'
+    - '.github/*'
 
 pool:
   vmImage: 'ubuntu-18.04'
