@@ -52,7 +52,7 @@ stages:
 
     - bash: |
         echo "testing $(testing)"
-      display: debug conditional vars
+      displayName: debug conditional vars
 
       # probably shouldn't even output since it's a secret
     - bash: |
