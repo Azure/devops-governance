@@ -31,7 +31,7 @@ stages:
 
         # Run `terraform plan` and save output (used later for posting to GitHub)
         if terraform plan -detailed-exitcode -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID \
-            | tee ${{ variables.planOutputFile }} \
+            | tee plan-output.txt \
             exit ${PIPESTATUS[0]}
         then
           echo "🟢 No configuration drift detected"
