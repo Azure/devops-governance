@@ -39,7 +39,7 @@ steps:
     terraform plan \
       -detailed-exitcode \
       -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID
-  displayName: Terraform Plan (ignores drift)
+  displayName: Terraform - Detect Drift
   env:
     ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
     ARM_CLIENT_ID:              $(kv-arm-client-id)
