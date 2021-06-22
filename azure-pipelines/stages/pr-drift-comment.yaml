@@ -1,30 +1,19 @@
 stages:
 
-# Stage: Terraform Plan
-# ---------------------
+# ------------
+# Detect Drift
+# ------------
+
 - stage: terraformStage
   displayName: Detect Drift
   jobs:
   - job: terraformJob
     displayName: Terraform Plan
     steps:
-    # Step - terraform init
-    - bash: |
-        terraform -version
-        terraform init \
-          -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
-          -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
-          -backend-config="key=$TF_STATE_BLOB_FILE" \
-          -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
-      displayName: Terraform - Init
-      # condition: eq(variables.isProduction, 'True') # never / Debugging
-      env:
-        TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
-        TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
-        TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
-        TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
+    - template: ./../steps/terraform-init.yaml
 
-    # Step - terraform plan
+    # terraform plan
+    # --------------
     - bash: |
         # Remember Exit Code
         set -uo pipefail
@@ -43,7 +32,6 @@ stages:
           exit $tf_exit_code
         fi
       displayName: Terraform - Detect configuration drift
-      # condition: eq(variables.isProduction, 'True') # never / Debugging
       name: planStep
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
@@ -54,32 +42,33 @@ stages:
         AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
         AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)
 
-    # Step - pass `terraform plan` output to downstream jobs
+    # Save plan output
+    # ----------------
     - publish: ./plan-output.txt
       artifact: terraformPlanOutput
       displayName: Save 'terraform plan' output
       condition: succeededOrFailed()
 
 
-# Stage: Pull Request Comment
 # ---------------------------
+# Post Status to Pull Request
+# ---------------------------
+
 - stage: pullRequestCommentStage
   displayName: Add Results to Pull Request
   condition: and(succeededOrFailed(), eq(variables.isPR, 'True'))
   variables:
     githubRepoName:       Azure/devops-governance
     githubConnectionName: e2e-governance-demo
-    adoOrgName:           julie-msft
-    adoProjectName:       e2e-governance-demo
     exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
-    artifactName:         terraformPlanOutput
-    # planOutput:           $[ stageDependencies.terraformStage.terraformJob.outputs['outputPlanStep.planOutput'] ]
+    artifactName:         terraformPlanOutput # Debugging
   jobs:
   - job: postCommentJob
     displayName: Post to GitHub
     steps:
 
-    # Step - post, No Drift
+    # Add Comment - No Drift
+    # ----------------------
     - task: GitHubComment@0
       condition: eq(variables.exitCode, 'zero')
       displayName: Post - No Drift
@@ -91,7 +80,8 @@ stages:
 
           Source Version: $(Build.SourceVersion)
 
-    # Step - post, Drift detected
+    # Add Comment - Drift detected
+    # ----------------------------
     - task: GitHubComment@0
       condition: eq(variables.exitCode, 'non-zero')
       displayName: Post - Has Drift
@@ -107,7 +97,8 @@ stages:
 
           Proceed with caution!
 
-  # Debugging - Work in progress
+  # Debugging Job
+  # -------------
   - job: debugOutput
     displayName: Debug Output
     steps:
