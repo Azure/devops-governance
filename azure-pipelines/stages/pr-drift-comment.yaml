@@ -10,7 +10,7 @@ stages:
   - job: terraformJob
     displayName: Terraform Plan
     steps:
-    - template: ./../steps/terraform-init.yaml
+    - template: ../steps/terraform-init.yaml
 
     # terraform plan
     # --------------
