@@ -3,7 +3,8 @@ name: $(BuildID)
 pool:
   vmImage: 'ubuntu-18.04'
 
-trigger: none # Schedule only
+trigger: none
+pr: none
 
 schedules:
   - cron: "0 0 * * *"
