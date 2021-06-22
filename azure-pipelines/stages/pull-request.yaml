@@ -10,10 +10,9 @@ stages:
   - job: terraformJob
     displayName: Terraform Plan
     steps:
-    - template: ../steps/terraform-init.yaml
-
     # terraform plan
     # --------------
+    - template: ../steps/terraform-init.yaml
     - bash: |
         # Remember Exit Code
         set -uo pipefail
@@ -61,7 +60,7 @@ stages:
     githubRepoName:       Azure/devops-governance
     githubConnectionName: e2e-governance-demo
     exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
-    artifactName:         terraformPlanOutput # Debugging
+    # artifactName:         terraformPlanOutput # Debugging, unused for now
   jobs:
   - job: postCommentJob
     displayName: Post to GitHub
@@ -97,20 +96,20 @@ stages:
 
           Proceed with caution!
 
-  # Debugging Job
+  # Debugging - turns out multiline variables not supported
   # -------------
-  - job: debugOutput
-    displayName: Debug Output
-    steps:
-    - download: current  # current pipeline
-      artifact: $(artifactName)
-      patterns: '*'
-      displayName: Download 'terraform plan' output
+  # - job: debugOutput
+  #   displayName: Debug Output
+  #   steps:
+  #   - download: current  # current pipeline
+  #     artifact: $(artifactName)
+  #     patterns: '*'
+  #     displayName: Download 'terraform plan' output
 
-    - bash: |
-        ls $(Pipeline.Workspace)
-        cat $(Pipeline.Workspace)/$(artifactName)/plan-output.txt
-      displayName: output download file
+  #   - bash: |
+  #       ls $(Pipeline.Workspace)
+  #       cat $(Pipeline.Workspace)/$(artifactName)/plan-output.txt
+  #     displayName: output download file
 
     # Step - work in progress
     # We can pass output to downstream stage/job.
