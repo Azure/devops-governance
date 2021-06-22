@@ -14,7 +14,8 @@ schedules:
 
 variables:
   - template: vars/global.yaml
-  - ${{ if eq(variables.isMain, 'True') }}:
+  # TEMP fix/drift-pipeline
+  - ${{ if or( eq(variables.isMain, 'True'), eq(variables['Build.SourceBranch'], 'refs/heads/fix/drift-pipeline') ) }}:
     - group: e2e-gov-demo-dev-kv
   - ${{ if eq(variables.isProduction, 'True') }}:
     - group: e2e-gov-demo-kv
