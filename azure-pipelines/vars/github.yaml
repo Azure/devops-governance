@@ -1,0 +1,3 @@
+variables:
+  githubRepoName:       Azure/devops-governance
+  githubConnectionName: e2e-governance-demo

@@ -10,6 +10,7 @@ pr:
 
 variables:
   - template: vars/global.yaml
+  - template: vars/github.yaml
   - group: e2e-gov-demo-dev-kv # DEV
 
 stages:
