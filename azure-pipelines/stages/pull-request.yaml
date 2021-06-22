@@ -57,8 +57,10 @@ stages:
   displayName: Add Results to Pull Request
   condition: and(succeededOrFailed(), eq(variables.isPR, 'True'))
   variables:
-    # artifactName: terraformPlanOutput # Debugging, unused for now
-    exitCode:     $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
+    githubRepoName:       Azure/devops-governance
+    githubConnectionName: e2e-governance-demo
+    exitCode:             $[ stageDependencies.terraformStage.terraformJob.outputs['planStep.exitCode'] ]
+    # artifactName:         terraformPlanOutput # Debugging, unused for now
   jobs:
   - job: postCommentJob
     displayName: Post to GitHub
