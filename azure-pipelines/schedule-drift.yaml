@@ -3,6 +3,8 @@ name: $(BuildID)
 pool:
   vmImage: 'ubuntu-18.04'
 
+trigger: none # Schedule only
+
 schedules:
   - cron: "0 0 * * *"
     displayName: Daily midnight build
@@ -14,8 +16,7 @@ schedules:
 
 variables:
   - template: vars/global.yaml
-  # TEMP fix/drift-pipeline
-  - ${{ if or( eq(variables.isMain, 'True'), eq(variables['Build.SourceBranch'], 'refs/heads/fix/drift-pipeline') ) }}:
+  - ${{ if eq(variables.isMain, 'True') }}:
     - group: e2e-gov-demo-dev-kv
   - ${{ if eq(variables.isProduction, 'True') }}:
     - group: e2e-gov-demo-kv
