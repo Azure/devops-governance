@@ -1,0 +1,16 @@
+parameters:
+- name: extraFlags
+  type: string
+  default: ""
+
+steps:
+- bash: terraform plan -var superadmins_aad_object_id=$AAD_SUPERADMINS_GROUP_ID ${{ parameters.extraFlags }}
+  displayName: Terraform Plan
+  env:
+    ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
+    ARM_CLIENT_ID:              $(kv-arm-client-id)
+    ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
+    ARM_TENANT_ID:              $(kv-arm-tenant-id)
+    AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
+    AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
+    AAD_SUPERADMINS_GROUP_ID:   $(kv-aad-superadmins-group-id)

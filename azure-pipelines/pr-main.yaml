@@ -14,4 +14,4 @@ variables:
 
 stages:
   - template: stages/ci.yaml
-  - template: stages/pr-drift-comment.yaml
+  - template: stages/pull-request.yaml
