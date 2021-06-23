@@ -23,18 +23,8 @@ variables:
   - group: e2e-gov-demo-kv
 
 steps:
-- bash: |
-    echo "KV_DEBUG_ENV: $KV_DEBUG_ENV"
-    if [ "$KV_DEBUG_ENV" = '$(kv-debug-env)' ]; then
-      echo "Key Vault not loaded. If loaded properly, debug env value would be 'dev' or 'production'."
-      exit 1
-    else
-      echo "Key Vault loaded for: $KV_DEBUG_ENV"
-    fi
-  displayName: Key Vault loaded?
-  env:
-    KV_DEBUG_ENV: $(kv-debug-env)
 - template: steps/debug-vars.yaml
+- template: steps/confirm-kv-loaded.yaml
 - template: steps/terraform-init.yaml
 - template: steps/terraform-plan.yaml
   parameters:

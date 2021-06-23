@@ -3,4 +3,4 @@ steps:
     echo  "isMain: ${{ variables.isMain }}"
     echo  "isProduction: ${{ variables.isProduction }}"
     echo  "Build.SourceBranch: ${{ variables['Build.SourceBranch'] }}"
-  displayName: Debug Branch vars
+  displayName: Debug - Branch Variables
