@@ -7,22 +7,26 @@ trigger: none
 pr: none
 
 schedules:
-  - cron: "0 0 * * *"
-    displayName: Daily Midnight Build
-    always: true
-    branches:
-      include:
-      - main
-      - production
+- cron: "0 0 * * *"
+  displayName: Daily Midnight Build
+  always: true
+  branches:
+    include:
+    - main
+    - production
 
 variables:
-  - template: vars/global.yaml
-  - ${{ if eq(variables.isMain, 'True') }}:
-    - group: e2e-gov-demo-dev-kv
-  - ${{ if eq(variables.isProduction, 'True') }}:
-    - group: e2e-gov-demo-kv
+- template: vars/global.yaml
+- ${{ if eq(variables.isMain, 'True') }}:
+  - group: e2e-gov-demo-dev-kv
+- ${{ if eq(variables.isProduction, 'True') }}:
+  - group: e2e-gov-demo-kv
 
 steps:
+- bash: |
+    echo  "isMain ${{ variables.isMain }}"
+    echo  "isProduction ${{ variables.isProduction }}"
+  displayName: Debug Vars
 - template: steps/terraform-init.yaml
 - template: steps/terraform-plan.yaml
   parameters:
