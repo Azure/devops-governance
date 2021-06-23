@@ -1,0 +1,18 @@
+steps:
+- bash: |
+    echo ""
+    echo ""
+
+    echo "***** Confirm Key Vault Integration *****"
+    echo "Fail pipeline if no key vault is loaded before Terraform tries and fails."
+    echo "KV_DEBUG_ENV: $KV_DEBUG_ENV"
+    echo ""
+    if [ "$KV_DEBUG_ENV" = '$(kv-debug-env)' ]; then
+      echo "Key Vault not loaded. If loaded properly, debug env value would be 'dev' or 'production'."
+      exit 1
+    else
+      echo "Key Vault loaded for: $KV_DEBUG_ENV"
+    fi
+  displayName: Debug - Key Vault loaded?
+  env:
+    KV_DEBUG_ENV: $(kv-debug-env)
