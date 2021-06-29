@@ -8,7 +8,7 @@ steps:
     echo ""
     if [ "$KV_DEBUG_ENV" = '$(kv-debug-env)' ]; then
       echo "⛔️ Key Vault not loaded"
-      echo "Please double check configuration Variable Groups in Azure Pipelines UI and that the YAML pipeline is running against the `main` or `production` branch."
+      echo "Please double check configuration Variable Groups in Azure Pipelines UI and that the YAML pipeline is running against the 'main' or 'production' branch."
       exit 1
     else
       echo "✅ Key Vault loaded"
