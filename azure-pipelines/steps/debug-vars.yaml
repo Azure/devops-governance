@@ -1,5 +1,9 @@
 steps:
 - bash: |
+    echo ""
+    echo "---------"
+    echo "Debugging"
+    echo "---------"
     echo  "isMain: ${{ variables.isMain }}"
     echo  "isProduction: ${{ variables.isProduction }}"
     echo  "Build.SourceBranch: ${{ variables['Build.SourceBranch'] }}"

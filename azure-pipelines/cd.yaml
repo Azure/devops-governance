@@ -19,19 +19,16 @@ pool:
 
 variables:
 - template: vars/global.yaml
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+  - group: e2e-gov-demo-dev-kv
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
+  - group: e2e-gov-demo-kv
 
 stages:
 - template: stages/ci.yaml
 
 - stage: cd_stage
-  displayName: CD Stage
-
-  variables:
-  - ${{ if eq(variables.isMain, 'True') }}:
-    - group: e2e-gov-demo-dev-kv
-  - ${{ if eq(variables.isProduction, 'True') }}:
-    - group: e2e-gov-demo-kv
-
+  displayName: CD - Deployment
   jobs:
   - job: deploy
     displayName: Terraform Plan and Apply

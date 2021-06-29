@@ -17,9 +17,9 @@ schedules:
 
 variables:
 - template: vars/global.yaml
-- ${{ if eq(variables.isMain, 'True') }}:
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
   - group: e2e-gov-demo-dev-kv
-- ${{ if eq(variables.isProduction, 'True') }}:
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
   - group: e2e-gov-demo-kv
 
 steps:
