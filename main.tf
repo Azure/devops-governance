@@ -196,7 +196,7 @@ module "ado_collaboration_permissions_veggies" {
 module "service_connections" {
   for_each                 = module.arm_environments
   source                   = "./modules/azure-devops-service-connection"
-  service_principal_id     = module.service_principals[each.key].principal_id
+  service_principal_id     = module.service_principals[each.key].client_id
   service_principal_secret = module.service_principals[each.key].client_secret
   resource_group_name      = "${replace(each.key, "_", "-")}-${local.suffix}-rg"
 
