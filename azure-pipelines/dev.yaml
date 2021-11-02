@@ -23,5 +23,5 @@ variables:
 - group: e2e-gov-demo-dev-kv # DEV specific credentials, etc.
 
 stages:
-- template: stages/ci.yaml
+# - template: stages/ci.yaml
 - template: stages/cd.yaml
