@@ -1,0 +1,23 @@
+stages:
+- stage: CDStage
+  displayName: CD - Deployment
+  jobs:
+  - job: deploy
+    displayName: Terraform Plan and Apply
+    steps:
+    - template: steps/debug-vars.yaml
+    - template: steps/confirm-kv-loaded.yaml
+    - template: steps/terraform-init.yaml
+    - template: steps/terraform-plan.yaml
+      parameters:
+        extraFlags: "-out=deployment.tfplan"
+
+    # - bash: terraform apply -auto-approve deployment.tfplan
+    #   displayName: Terraform Apply
+    #   env:
+    #     ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
+    #     ARM_CLIENT_ID:              $(kv-arm-client-id)
+    #     ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
+    #     ARM_TENANT_ID:              $(kv-arm-tenant-id)
+    #     AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
+    #     AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
