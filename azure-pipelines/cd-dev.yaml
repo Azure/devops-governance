@@ -1,0 +1,26 @@
+name: $(BuildID)
+
+trigger:
+  branches:
+    include:
+    - main # DEV
+    - fix/pipelines # temp
+  paths:
+    exclude:
+    - '*.md'
+    - 'backends/*'
+    - 'images/*'
+    - '.github/*'
+
+pr: none # disable for security securtiy
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+variables:
+- template: vars/global.yaml
+- group: e2e-gov-demo-dev-kv # DEV specific credentials, etc.
+
+stages:
+- template: stages/ci.yaml
+- template: stages/cd.yaml

@@ -3,9 +3,7 @@ name: $(BuildID)
 trigger:
   branches:
     include:
-    # - main
-    # - production
-    - fix/pipelines # temp for testing
+    - production # PROD
   paths:
     exclude:
     - '*.md'
@@ -13,15 +11,15 @@ trigger:
     - 'images/*'
     - '.github/*'
 
-pr: none
+pr: none # disable for security securtiy
 
 pool:
   vmImage: 'ubuntu-18.04'
 
 variables:
 - template: vars/global.yaml
-- group: e2e-gov-demo-dev-kv # DEV specific credentials, etc.
+- group: e2e-gov-demo-kv # PROD specific credentials, etc.
 
 stages:
-# - template: stages/ci.yaml
+- template: stages/ci.yaml
 - template: stages/cd.yaml

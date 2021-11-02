@@ -3,7 +3,6 @@ name: $(BuildID)
 trigger:
   branches:
     include:
-    - main
     - feat/*
     - fix/*
   paths:
