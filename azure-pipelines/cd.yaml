@@ -27,7 +27,7 @@ stages:
 - stage: cd_stage
   displayName: CD - Deployment
   variables:
-  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/fix/pipelines-stages') }}:
     - group: e2e-gov-demo-dev-kv
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
     - group: e2e-gov-demo-kv
