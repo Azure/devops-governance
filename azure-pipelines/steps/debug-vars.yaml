@@ -4,7 +4,7 @@ steps:
     echo "---------"
     echo "Debugging"
     echo "---------"
-    echo  "isMain: ${{ variables.isMain }}"
-    echo  "isProduction: ${{ variables.isProduction }}"
+    echo  "isMain: $(isMain)"
+    echo  "isProduction: $(isProduction)"
     echo  "Build.SourceBranch: ${{ variables['Build.SourceBranch'] }}"
   displayName: Debug - Branch Variables
