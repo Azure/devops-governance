@@ -19,9 +19,9 @@ pool:
 
 variables:
 - template: vars/global.yaml
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+- ${{ if eq(variables.isMain, 'True') }}:
   - group: e2e-gov-demo-dev-kv
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
+- ${{ if eq(variables.isProduction, 'True') }}:
   - group: e2e-gov-demo-kv
 
 stages:
@@ -34,7 +34,6 @@ stages:
     displayName: Terraform Plan and Apply
     steps:
     - template: steps/debug-vars.yaml
-    - template: steps/confirm-kv-loaded.yaml
     - template: steps/terraform-init.yaml
     - template: steps/terraform-plan.yaml
       parameters:
