@@ -20,10 +20,10 @@ pool:
 
 variables:
 - template: vars/global.yaml
-# - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/fix/another-try') }}:
-#   - group: e2e-gov-demo-dev-kv
-# - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
-#   - group: e2e-gov-demo-kv
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/fix/another-try') }}:
+  - group: e2e-gov-demo-dev-kv
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
+  - group: e2e-gov-demo-kv
 
 stages:
 # - template: stages/ci.yaml
