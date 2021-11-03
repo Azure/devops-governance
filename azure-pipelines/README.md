@@ -8,7 +8,7 @@ Brief notes and considerations when automating infrastructure with [Terraform](h
 
 | Pipeline | Branch | Terraform Backend | Detects Drift | Deploys |
 |:--|:--|:--|:--|:--|
-| [`ci.yaml`](./ci.yaml) | &bull; `main`<br>&bull; `feat/*`<br>&bull; `fix/*`  | local | No | No |
+| [`ci.yaml`](./ci.yaml) | &bull; `feat/*`<br>&bull; `fix/*`  | local | No | No |
 | [`cd.yaml`](./cd.yaml) | &bull; `main` <br>&bull; `production` | Azure Storage | No* | Yes  |
 
 _*The CD pipeline does not check for drift because this is checked at the pull request._
