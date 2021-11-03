@@ -35,7 +35,7 @@ stages:
     displayName: Terraform Plan and Apply
     steps:
     - template: steps/debug-vars.yaml
-    # - template: steps/confirm-kv-loaded.yaml # Maybe this is the problem
+    - template: steps/confirm-kv-loaded.yaml # Maybe this is the problem
     - template: steps/terraform-init.yaml
     - template: steps/terraform-plan.yaml
       parameters:
