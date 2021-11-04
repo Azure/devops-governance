@@ -120,10 +120,23 @@ source ./.env
 
 #### 3a) From local computer (recommended)
 
-Assuming you are logged in with `az login`, just run
+First log into Azure and select the subscription you want to deploy to
 
 ```
-terraform init -backend=false
+az login
+az account set --subscription <SUBSCRIPTION_ID>
+```
+
+Then override the terraform backend to be local (because repo default is remote for CI/CD) by removing `.sample` from the file extension
+
+```
+mv _override.tf.sample _override.tf
+```
+
+Finally initialize Terraform
+
+```
+terraform init
 ```
 
 Then continue to [Create Deployment Plan &rarr;](##create-deployment-plan)

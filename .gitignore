@@ -11,6 +11,9 @@ local.auto.tfvars
 *.tfstate.*
 *.backend.hcl
 
+# For local Terraform deployment
+_override.tf
+
 # Debugging
 debug.azcli
 
