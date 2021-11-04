@@ -25,10 +25,8 @@ variables:
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#understand-variable-syntax
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
   - group: e2e-gov-demo-dev-kv
-    readonly: true
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
   - group: e2e-gov-demo-kv
-    readonly: true
 
 stages:
 - template: stages/ci.yaml
