@@ -1,12 +1,13 @@
 steps:
 - bash: |
+    set -x
     echo ""
     echo "--------------------------------"
     echo "Confirm Key Vault 🔑 Integration"
     echo "--------------------------------"
     echo "KV_DEBUG_ENV: $KV_DEBUG_ENV"
     echo ""
-    if [ $KV_DEBUG_ENV == "\$\(kv-debug-env\)" ]; then
+    if [ $KV_DEBUG_ENV == '$(kv-debug-env)' ]; then
       echo "⛔️ Key Vault not loaded"
       echo "Please double check configuration Variable Groups in Azure Pipelines UI and that the YAML pipeline is running against the 'main' or 'production' branch."
       exit 1
