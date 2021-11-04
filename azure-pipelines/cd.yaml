@@ -19,9 +19,13 @@ pool:
 
 variables:
 - template: vars/global.yaml
-- ${{ if eq(variables.isMain, 'True') }}:
+
+# Conditional uses ${{ }} syntax in order to be processed at compile time
+# in order to work for loading variable groups. For details see:
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#understand-variable-syntax
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
   - group: e2e-gov-demo-dev-kv
-- ${{ if eq(variables.isProduction, 'True') }}:
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
   - group: e2e-gov-demo-kv
 
 stages:
