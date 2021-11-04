@@ -4,7 +4,13 @@ steps:
     echo "---------"
     echo "Debugging"
     echo "---------"
-    echo  "isMain: $(isMain)"
-    echo  "isProduction: $(isProduction)"
-    echo  "Build.SourceBranch: ${{ variables['Build.SourceBranch'] }}"
-  displayName: Debug - Branch Variables
+    echo "Build.SourceBranch: ${{ variables['Build.SourceBranch'] }}"
+    echo "isMain: $(isMain)"
+    echo "isProduction: $(isProduction)"
+    echo "isTag: $(isTag)"
+    echo "isFork: $(isFork)"
+    echo "isPR: $(isPR)"
+    echo "isTrustedCode: $(isTrustedCode)"
+    echo "isScheduled: $(isScheduled)"
+    echo "isTrustedCI: $(isTrustedCI)"
+  displayName: Debug - Custom Variables

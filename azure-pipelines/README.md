@@ -4,14 +4,16 @@ Brief notes and considerations when automating infrastructure with [Terraform](h
 
 ## Overview
 
-### Branch Commit Triggered
+### Branch Triggered
+
+Please note
+- The CI pipeline does not run for `main` or `production` because these steps are run in Pull Requests, which are required before merging.
+* The CD pipeline does not check for drift because this is checked at the pull request.
 
 | Pipeline | Branch | Terraform Backend | Detects Drift | Deploys |
 |:--|:--|:--|:--|:--|
-| [`ci.yaml`](./ci.yaml) | &bull; `main`<br>&bull; `feat/*`<br>&bull; `fix/*`  | local | No | No |
-| [`cd.yaml`](./cd.yaml) | &bull; `main` <br>&bull; `production` | Azure Storage | No* | Yes  |
-
-_*The CD pipeline does not check for drift because this is checked at the pull request._
+| [`ci.yaml`](./ci.yaml) | &bull; `feat/*`<br>&bull; `fix/*`  | local | No | No |
+| [`cd.yaml`](./cd.yaml) | &bull; `main` <br>&bull; `production` | Azure Storage | No | 🚀 Yes  |
 
 ### Pull Request Triggered
 
@@ -73,7 +75,7 @@ steps:
     TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
 ```
 
-### Why is there an Azure AD "Superadmins" Group? 
+## Why is there an Azure AD "Superadmins" Group? 
 
 In this example "superadmins" refers to privileged accounts at the organization level, e.g. central IT infrastructure admins.
 
