@@ -1,0 +1,7 @@
+# What is `superadmins_aad_object_id`?
+# To use this in your terraform project, remove the `.example` extension
+# of this file and set the value to the Object ID of the Azure Active
+# Directory group that contains both you and the priviledged service
+# principle running infrastructure as code
+
+superadmins_aad_object_id = "<guid>"
