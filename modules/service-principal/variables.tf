@@ -13,7 +13,7 @@ variable "name" {
 
 variable "tenant_id" {
   type        = string
-  description = "Azure AD Tenant ID"
+  description = "Azure Active Directory Tenant ID"
   default     = "Current Client Tenant ID"
 }
 
