@@ -38,6 +38,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_connection_name"></a> [connection\_name](#output\_connection\_name) | n/a |
-| <a name="output_scope"></a> [scope](#output\_scope) | n/a |
+| <a name="output_connection_name"></a> [connection\_name](#output\_connection\_name) | Name of the created Service Connection |
+| <a name="output_scope"></a> [scope](#output\_scope) | Scope (Resource Group) of the created Service Connection |
 <!-- END_TF_DOCS -->

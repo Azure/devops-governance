@@ -5,6 +5,7 @@ output "contributors" {
     project_role   = data.azuredevops_group.contributors.name
     subject_kind   = azuredevops_group.team_group.subject_kind
   }
+  description = "Output membership in 'Contributors' role as HCL map/object with `origin`, `principal_name`, `project_role` and `subject_kind` properties."
 }
 
 output "project_admins" {
@@ -14,4 +15,5 @@ output "project_admins" {
     project_role   = data.azuredevops_group.admins.name
     subject_kind   = azuredevops_group.admins_group.subject_kind
   }
+  description = "Output membership in 'Project Administrators' role as an HCL map/object with `origin`, `principal_name`, `project_role` and `subject_kind` properties."
 }

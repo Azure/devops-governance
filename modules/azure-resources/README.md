@@ -46,7 +46,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_key_vault"></a> [key\_vault](#output\_key\_vault) | n/a |
-| <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | n/a |
-| <a name="output_storage_account"></a> [storage\_account](#output\_storage\_account) | n/a |
+| <a name="output_key_vault"></a> [key\_vault](#output\_key\_vault) | Name of created Key Vault |
+| <a name="output_resource_group"></a> [resource\_group](#output\_resource\_group) | HCL map/object of resource group with `name` and `id` properties. |
+| <a name="output_storage_account"></a> [storage\_account](#output\_storage\_account) | Name of created Storage Account |
 <!-- END_TF_DOCS -->

@@ -34,15 +34,15 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_name"></a> [name](#input\_name) | Name for service principal | `string` | n/a | yes |
 | <a name="input_password_lifetime"></a> [password\_lifetime](#input\_password\_lifetime) | Lifetime of password in hours, e.g. '720h'. Defaults to 6 months. After password expires, credential needs to be refreshed (but not deleted). | `string` | `"4380h"` | no |
-| <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Azure AD Tenant ID | `string` | `"Current Client Tenant ID"` | no |
+| <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Azure Active Directory Tenant ID | `string` | `"Current Client Tenant ID"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_aad_app"></a> [aad\_app](#output\_aad\_app) | n/a |
+| <a name="output_aad_app"></a> [aad\_app](#output\_aad\_app) | Map with `display_name`, `object_id` and `application_id` properties for the Azure AD application |
 | <a name="output_client_id"></a> [client\_id](#output\_client\_id) | Client ID for Service Principal |
 | <a name="output_client_secret"></a> [client\_secret](#output\_client\_secret) | Client Secret for Service Principal |
-| <a name="output_display_name"></a> [display\_name](#output\_display\_name) | n/a |
-| <a name="output_principal_id"></a> [principal\_id](#output\_principal\_id) | n/a |
+| <a name="output_display_name"></a> [display\_name](#output\_display\_name) | Azure AD App Display name |
+| <a name="output_principal_id"></a> [principal\_id](#output\_principal\_id) | Principal ID for the Service Principal |
 <!-- END_TF_DOCS -->

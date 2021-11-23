@@ -30,7 +30,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_admin_aad_id"></a> [admin\_aad\_id](#input\_admin\_aad\_id) | AAD Group ID to receive 'Owner' permissions | `string` | n/a | yes |
+| <a name="input_admin_aad_id"></a> [admin\_aad\_id](#input\_admin\_aad\_id) | AAD Group ID to receive 'Project Administrator' permissions | `string` | n/a | yes |
 | <a name="input_ado_project_id"></a> [ado\_project\_id](#input\_ado\_project\_id) | Azure DevOps Project ID | `string` | n/a | yes |
 | <a name="input_team_aad_id"></a> [team\_aad\_id](#input\_team\_aad\_id) | AAD Group ID to receive 'Contributor' permissions | `string` | n/a | yes |
 
@@ -38,6 +38,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_contributors"></a> [contributors](#output\_contributors) | n/a |
-| <a name="output_project_admins"></a> [project\_admins](#output\_project\_admins) | n/a |
+| <a name="output_contributors"></a> [contributors](#output\_contributors) | Output membership in 'Contributors' role as HCL map/object with `origin`, `principal_name`, `project_role` and `subject_kind` properties. |
+| <a name="output_project_admins"></a> [project\_admins](#output\_project\_admins) | Output membership in 'Project Administrators' role as an HCL map/object with `origin`, `principal_name`, `project_role` and `subject_kind` properties. |
 <!-- END_TF_DOCS -->

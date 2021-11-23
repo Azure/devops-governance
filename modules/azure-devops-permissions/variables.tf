@@ -10,6 +10,6 @@ variable "team_aad_id" {
 }
 
 variable "admin_aad_id" {
-  description = "AAD Group ID to receive 'Owner' permissions"
+  description = "AAD Group ID to receive 'Project Administrator' permissions"
   type        = string
 }
