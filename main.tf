@@ -27,6 +27,7 @@ resource "azuread_group" "groups" {
   for_each                = var.groups
   display_name            = "demo-${each.value}-${local.suffix}"
   prevent_duplicate_names = true
+  security_enabled        = true
 }
 
 # ------------------

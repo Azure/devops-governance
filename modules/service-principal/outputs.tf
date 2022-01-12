@@ -7,11 +7,11 @@ output "aad_app" {
 }
 
 output "display_name" {
-	value = azuread_application.app.display_name
+  value = azuread_application.app.display_name
 }
 
 output "principal_id" {
-	value = azuread_service_principal.sp.id
+  value = azuread_service_principal.sp.id
 }
 
 output "client_id" {
@@ -20,7 +20,7 @@ output "client_id" {
 }
 
 output "client_secret" {
-  value       = random_password.secret.result
-  description = "Client Secret for Service Principal"
+  value       = azuread_application_password.workspace_sp_secret.value
+  description = "Client Secret for Service Principal to be imported into Key Vault"
   sensitive   = true
 }
