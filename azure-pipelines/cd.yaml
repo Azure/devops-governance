@@ -19,6 +19,7 @@ pool:
 
 variables:
 - template: vars/global.yaml
+- group: mask-ids
 
 # Conditional uses ${{ }} syntax in order to be processed at compile time
 # in order to work for loading variable groups. For details see:
