@@ -5,6 +5,12 @@ variable "superadmins_aad_object_id" {
   default     = ""
 }
 
+variable "application_owners_ids" {
+  type        = list(string)
+  description = "A set of object IDs of principals that will be granted ownership of the application (service principal). Supported object types are users or service principals. It is best practice to specify one or more owners, incl. the principal used to execute Terraform"
+  default     = []
+}
+
 # AAD Groups
 variable "groups" {
   type = map(string)
