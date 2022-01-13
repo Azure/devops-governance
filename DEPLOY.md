@@ -106,20 +106,22 @@ Make sure you are authenticated to Azure.
 
 ### 2) Configure Environment
 
-The [Azure DevOps Provider](https://www.terraform.io/docs/providers/azuredevops/index.html) in Terraform expects the following environment variables to be set.
-
-To make this easier, create a `.env` file using the included `.env.sample` as a template and fill in your values:
+The [Azure DevOps Provider](https://www.terraform.io/docs/providers/azuredevops/index.html) in Terraform expects the following environment variables to be set:
 
 ```
 export AZDO_ORG_SERVICE_URL="https://dev.azure.com/<your-demo-org-name>"
 export AZDO_PERSONAL_ACCESS_TOKEN="…"
 ```
 
+To make this easier, create a `.env` file, using the included `.env.sample` as a template and fill in your values. 
+
 Then load the variables into your shell:
 
 ```bash
 source ./.env
 ```
+
+Please note that `.env` file name is a common convention and some frameworks will automatically load this configuration file. However, it is meant to be used in a _local development only_ and should _never_ be checked into git.
 
 ### 3) Initialize Terraform
 
