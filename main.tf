@@ -13,10 +13,9 @@ resource "random_string" "suffix" {
 }
 
 locals {
-  suffix = random_string.suffix.result
-
-  # Default to current ARM client
-  superadmins_aad_object_id = var.superadmins_aad_object_id == "" ? data.azurerm_client_config.current.object_id : var.superadmins_aad_object_id
+  suffix                    = random_string.suffix.result
+  application_owners_ids    = length(var.application_owners_ids) == 0 ? [data.azurerm_client_config.current.object_id] : var.application_owners_ids
+  superadmins_aad_object_id = var.superadmins_aad_object_id == "" ? data.azurerm_client_config.current.object_id : var.superadmins_aad_object_id # Default to current ARM client
 }
 
 # ---------------
@@ -40,6 +39,7 @@ module "service_principals" {
   for_each = var.environments
   source   = "./modules/service-principal"
   name     = "${each.value.team}-${each.value.env}-${local.suffix}-ci-sp"
+  owners   = local.application_owners_ids
 }
 
 # ------------------------------
