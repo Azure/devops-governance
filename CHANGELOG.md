@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/Azure/devops-governance/compare/v0.3.0...v0.4.0) (2022-01-27)
+
+
+### Features
+
+* **aad:** add owners to application objects [#49](https://github.com/Azure/devops-governance/issues/49) ([712e236](https://github.com/Azure/devops-governance/commit/712e2362d91a84794c2b3c8ceb18a6e7652a0af7))
+* **azuread-provider:** upgrade to v2 [#49](https://github.com/Azure/devops-governance/issues/49) ([fd7a1e6](https://github.com/Azure/devops-governance/commit/fd7a1e6152532e50512e2b731b3833901355bc71))
+* **ci-cd:** enable automation for multiple environments ([#27](https://github.com/Azure/devops-governance/issues/27)) ([54fb1ce](https://github.com/Azure/devops-governance/commit/54fb1cefebf8b0a01f345f0fad3c7c378af8932c))
+* **devops:** mask tenant and user principal ids ([c8b43c9](https://github.com/Azure/devops-governance/commit/c8b43c954782e788b41d0cebbb81630a4b713c96))
+* **pipelines:** more debugging output, update docs ([#42](https://github.com/Azure/devops-governance/issues/42)) ([c02d2d0](https://github.com/Azure/devops-governance/commit/c02d2d09097fcb2cb1357d085f2c157143574309))
+* **terraform:** enable local deployment, closes [#35](https://github.com/Azure/devops-governance/issues/35) ([#44](https://github.com/Azure/devops-governance/issues/44)) ([7322197](https://github.com/Azure/devops-governance/commit/7322197f56a1589409c0b67ad5cedc95369b91d7))
+
+
+### Bug Fixes
+
+* **pipeline:** load kv based on branch in scheduled drift detection ([#31](https://github.com/Azure/devops-governance/issues/31)) ([65f7bb4](https://github.com/Azure/devops-governance/commit/65f7bb449547b226f79f0483669976c6d28d33d7))
+* **pipeline:** scheduled drift detection ([#28](https://github.com/Azure/devops-governance/issues/28)) ([3e4906b](https://github.com/Azure/devops-governance/commit/3e4906bcb5ef8f6d7342aca983429fb9815e000a))
+* **pipeline-debug:** backticks in bash is command substitution ([#32](https://github.com/Azure/devops-governance/issues/32)) ([f5c5002](https://github.com/Azure/devops-governance/commit/f5c50025abb5326e52c2f9fa15c1428fc0b6f697))
+* **pipelines:** readonly property does not exist for var groups ([#43](https://github.com/Azure/devops-governance/issues/43)) ([1582aff](https://github.com/Azure/devops-governance/commit/1582aff254a30c5349b0a2c40ec3f23fed037213))
+* **pipelines:** remove broken bash step, clean up vars ([#39](https://github.com/Azure/devops-governance/issues/39)) ([7ba5c65](https://github.com/Azure/devops-governance/commit/7ba5c659eed6b542b886d88509a0e4d58df5d34a))
+* **pipelines:** var group conditioal must use compile time syntax ([#40](https://github.com/Azure/devops-governance/issues/40)) ([8045ea4](https://github.com/Azure/devops-governance/commit/8045ea4f2ae54a71bb74adf2d64790eec0567324))
+
 ## [0.3.0](https://github.com/Azure/devops-governance/compare/v0.2.0...v0.3.0) (2021-06-14)
 
 
