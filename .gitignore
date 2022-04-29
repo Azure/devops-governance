@@ -9,7 +9,7 @@ local.auto.tfvars
 *.tfplan
 *.tfstate
 *.tfstate.*
-*.backend.hcl
+backends/*.hcl
 
 # For local Terraform deployment
 _override.tf
