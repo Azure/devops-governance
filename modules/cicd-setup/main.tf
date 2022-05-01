@@ -120,10 +120,9 @@ output "aad_superowners_group_id" {
   value = azuread_group.superowners.object_id
 }
 
-output "headless_owner_sp" {
+output "headless_owner_service_principal" {
   value = {
-    display_name   = azuread_application.headless_owner.display_name
-    object_id      = azuread_application.headless_owner.object_id
-    application_id = azuread_application.headless_owner.application_id
+    display_name = azuread_service_principal.headless_owner.display_name
+    object_id    = azuread_service_principal.headless_owner.object_id
   }
 }

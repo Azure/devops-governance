@@ -37,14 +37,20 @@ When this Infrastructure as Code is deployed successfully…
 
 ```
 aad_superowners_group_id = "73c74b2f-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-headless_owner_sp = {
-  "application_id" = "89b93e8b-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+headless_owner_service_principal = {
   "display_name" = "governance-demo-github-cicd"
   "object_id" = "2c05b567-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 }
 ```
 
-👉 Note the **aad_superowners_group_id** value `73c74b2f-xxxx-xxxx-xxxx-xxxxxxxxxxxx` which you need for this project.
+### Required Object IDs for Main Project
+
+These values can be set locally. See [`local.auto.tfvars`](./../../../devops-governance/local.auto.tfvars.example) for details.
+
+👉 Note the **aad_superowners_group_id** value `73c74b2f-xxxx-xxxx-xxxx-xxxxxxxxxxxx` which you need for the `superadmins_aad_object_id` variable in the main project.
+
+👉 Note the **headless_owner_service_principal.object_id** value `2c05b567-xxxx-xxxx-xxxx-xxxxxxxxxxxx` which you need for the `application_owners_ids` variable in the main project.
+
 
 ## ❗️ Last Step - Grant Admin Consent
 
