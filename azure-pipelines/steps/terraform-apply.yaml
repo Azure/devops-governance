@@ -1,6 +1,6 @@
 steps:
 - bash: |
-    terraform -auto-approve $(tf-plan-file)
+    terraform apply -auto-approve $(terraformPlanFile)
   displayName: Terraform Apply
   env:
     ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)

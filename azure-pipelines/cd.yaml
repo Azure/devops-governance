@@ -33,6 +33,7 @@ stages:
   - group: e2e-gov-demo-headless-owner
   jobs:
   - job: devJob
+    displayName: Terraform - Plan and Apply
     variables:
       terraformStateFile: dev-v2.tfstate
       terraformStateContainer: terraform
