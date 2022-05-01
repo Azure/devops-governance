@@ -58,6 +58,11 @@ module "arm_environments" {
   superadmins_group_id = local.superadmins_aad_object_id
   service_principal_id = module.service_principals["${each.value.team}_${each.value.env}"].principal_id
   tags                 = local.tags
+
+  depends_on = [
+    azuread_group.groups,
+    module.service_principals
+  ]
 }
 
 # ==============
@@ -210,6 +215,7 @@ module "service_connections" {
 
   depends_on = [
     azuread_group.groups,
+    azuredevops_project.team_projects,
     module.arm_environments,
     module.service_principals
   ]
