@@ -1,6 +1,6 @@
-# ---------------
-# Azure AD Groups
-# ---------------
+# =================
+#  Azure AD Groups
+# =================
 # Workspaces generally have 2 groups of actors, general
 # team members who are granted "Contributor" permissions
 # and admins who are granted "Owner" permissions.
@@ -17,9 +17,9 @@ groups = {
   infra_admins   = "infra-admins"
 }
 
-# ---------------------
-# Azure DevOps Projects
-# ---------------------
+# =======================
+#  Azure DevOps Projects
+# =======================
 
 projects = {
   proj_fruits = {
@@ -41,9 +41,9 @@ projects = {
   }
 }
 
-# ----------------
-# ARM Environments
-# ----------------
+# ==================
+#  ARM Environments
+# ==================
 # The keys can be referenced in outputs,
 # e.g. module.workspace["shared"]. Suffixes are appended later.
 

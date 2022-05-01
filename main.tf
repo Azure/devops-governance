@@ -1,6 +1,6 @@
-# ------
-# Config
-# ------
+# ========
+#  Config
+# ========
 
 data "azurerm_client_config" "current" {}
 
@@ -18,9 +18,9 @@ locals {
   superadmins_aad_object_id = var.superadmins_aad_object_id == "" ? data.azurerm_client_config.current.object_id : var.superadmins_aad_object_id # Default to current ARM client
 }
 
-# ---------------
-# Azure AD Groups
-# ---------------
+# =================
+#  Azure AD Groups
+# =================
 
 resource "azuread_group" "groups" {
   for_each                = var.groups
@@ -29,9 +29,9 @@ resource "azuread_group" "groups" {
   security_enabled        = true
 }
 
-# ------------------
-# Service Principals
-# ------------------
+# ====================
+#  Service Principals
+# ====================
 
 # TODO: document use for CI only. Apps should use diff. SP per PILP
 
@@ -42,9 +42,11 @@ module "service_principals" {
   owners_list = local.application_owners_ids
 }
 
-# ------------------------------
-# Resource Groups ("Workspaces")
-# ------------------------------
+# ==============================
+#  ARM Resources ("Workspaces")
+# ==============================
+
+# Resource Group, Storage Account, and Key Vault
 
 module "arm_environments" {
   for_each             = var.environments
@@ -56,17 +58,18 @@ module "arm_environments" {
   service_principal_id = module.service_principals["${each.value.team}_${each.value.env}"].principal_id
 }
 
-# ------------
-# Azure DevOps
-# ------------
+# ==============
+#  Azure DevOps
+# ==============
 
 # The following section Bootstraps:
 # - Projects: Team silos and shared projects
 # - Security Group Assignments: like Role Assignments in ARM
 # - Service Connections: service principal credentials created in code above
 
-# Projects
-# --------
+# ==============
+#  ADO Projects
+# ==============
 
 # Team Projects
 
@@ -120,8 +123,9 @@ resource "azuredevops_project" "collaboration" {
   }
 }
 
-# Security Group Assignments
-# --------------------------
+# ================================
+#  ADO Security Group Assignments
+# ================================
 
 # Teams Silo Projects -  Security Group Assignments
 
@@ -191,8 +195,9 @@ module "ado_collaboration_permissions_veggies" {
   ]
 }
 
-# Service Connections
-# -------------------
+# =========================
+#  ADO Service Connections
+# =========================
 
 module "service_connections" {
   for_each                 = module.arm_environments
