@@ -30,34 +30,28 @@ stages:
   displayName: Deploy - Dev
   condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/fix/azure-pipelines'))
   variables:
-  - group: e2e-gov-demo-kv
-  jobs:
-  - job: deploy
-    displayName: Terraform Plan and Apply
-    variables:
-      tf-state-file: dev-v2.tfstate
-      tf-var-file:   environments/dev.tfvars
-    steps:
-    - bash: |
-        terraform -version
-        terraform init \
-          -backend-config="storage_account_name=$(kv-tf-state-blob-account)" \
-          -backend-config="sas_token=$(kv-tf-state-sas-token)" \
-          -backend-config="container_name=$(tf-state-container)" \
-          -backend-config="key=$(tf-state-file)"
-      displayName: Terraform Init
+  - group: e2e-gov-demo-kv # Todo - move to global scope?
+  - name:  tf-state-file
+    value: dev-v2.tfstate
+  - name:  tf-var-file
+    value: environments/dev.tfvars
 
-    - bash: |
-        terraform plan \
-          -var superadmins_aad_object_id=$(kv-aad-superadmins-group-id) \
-          -var 'application_owners_ids=$(kv-aad-app-owners-ids)' \
-          -var-file=$(tf-var-file) \
-          -out $(tf-plan-file)
-      displayName: Terraform Plan
-      env:
-        ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
-        ARM_CLIENT_ID:              $(kv-arm-client-id)
-        ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
-        ARM_TENANT_ID:              $(kv-arm-tenant-id)
-        AZDO_ORG_SERVICE_URL:       $(kv-ado-dev-org-url) # Dev Org
-        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-ado-pat)
+  jobs:
+  - job: planDev
+    displayName: Terraform Plan
+    variables:
+    - group: e2e-gov-demo-subscription-reader
+    steps:
+    - template: steps/terraform-init.yaml
+    - template: steps/terraform-plan.yaml
+
+  - job: applyDev
+    displayName: Terraform Plan
+    dependsOn: planDev
+    variables:
+    - group: e2e-gov-demo-headless-owner
+    steps:
+    - template: steps/terraform-init.yaml
+    - template: steps/terraform-plan.yaml
+    - template: steps/terraform-apply.yaml
+

@@ -2,13 +2,8 @@ steps:
 - bash: |
     terraform -version
     terraform init \
-      -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME" \
-      -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME" \
-      -backend-config="key=$TF_STATE_BLOB_FILE" \
-      -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN"
+      -backend-config="storage_account_name=$(kv-tf-state-blob-account)" \
+      -backend-config="sas_token=$(kv-tf-state-sas-token)" \
+      -backend-config="container_name=$(tf-state-container)" \
+      -backend-config="key=$(tf-state-file)"
   displayName: Terraform Init
-  env:
-    TF_STATE_BLOB_ACCOUNT_NAME:   $(kv-tf-state-blob-account)
-    TF_STATE_BLOB_CONTAINER_NAME: $(kv-tf-state-blob-container)
-    TF_STATE_BLOB_FILE:           $(kv-tf-state-blob-file)
-    TF_STATE_BLOB_SAS_TOKEN:      $(kv-tf-state-sas-token)
