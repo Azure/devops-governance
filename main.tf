@@ -42,9 +42,11 @@ module "service_principals" {
   owners_list = local.application_owners_ids
 }
 
-# ================================
-#  Resource Groups ("Workspaces")
-# ================================
+# ==============================
+#  ARM Resources ("Workspaces")
+# ==============================
+
+# Resource Group, Storage Account, and Key Vault
 
 module "arm_environments" {
   for_each             = var.environments
