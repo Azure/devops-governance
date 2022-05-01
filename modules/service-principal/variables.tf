@@ -23,11 +23,11 @@ variable "password_lifetime" {
   default     = "4380h"
 }
 
-variable "owners" {
+variable "owners_list" {
   type        = list(string)
   description = "A set of object IDs of principals that will be granted ownership of the application (service principal)."
   validation {
-    condition     = length(var.owners) > 0
+    condition     = length(var.owners_list) > 0
     error_message = "Every Application must have an owner. Owners cannot be empty."
   }
 }

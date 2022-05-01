@@ -4,7 +4,7 @@
 
 resource "azuread_application" "app" {
   display_name = local.name
-  owners       = var.owners
+  owners       = var.owners_list
 }
 
 resource "azuread_service_principal_password" "workspace_sp_secret" {
@@ -13,5 +13,5 @@ resource "azuread_service_principal_password" "workspace_sp_secret" {
 
 resource "azuread_service_principal" "sp" {
   application_id = azuread_application.app.application_id
-  owners         = var.owners
+  owners         = var.owners_list
 }
