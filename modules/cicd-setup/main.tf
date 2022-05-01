@@ -16,6 +16,7 @@ provider "azurerm" {
   features {}
 }
 
+
 # ========
 #  Config
 # ========
@@ -53,15 +54,6 @@ resource "azuread_service_principal_password" "headless_owner" {
   service_principal_id = azuread_service_principal.headless_owner.object_id
 }
 
-# "Owner" Role Assignment
-
-resource "azurerm_role_assignment" "headless_owner" {
-  scope                = data.azurerm_subscription.visual_studio.id
-  role_definition_name = "Owner"
-  principal_id         = azuread_service_principal.headless_owner.id
-}
-
-
 # ==================
 #  Owners AAD Group
 # ==================
@@ -73,9 +65,19 @@ resource "azuread_group" "superowners" {
   owners                  = [data.azuread_client_config.current.object_id]
   members = [
     data.azuread_client_config.current.object_id,
-    # azuread_application.headless_owner.object_id
     azuread_service_principal.headless_owner.id
   ]
+}
+
+
+# =========================
+#  "Owner" Role Assignment
+# =========================
+
+resource "azurerm_role_assignment" "gov_demo_owners_group" {
+  scope                = data.azurerm_subscription.visual_studio.id
+  role_definition_name = "Owner"
+  principal_id         = azuread_group.superowners.object_id
 }
 
 
