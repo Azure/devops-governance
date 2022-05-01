@@ -214,6 +214,7 @@ module "service_connections" {
 
   depends_on = [
     azuread_group.groups,
+    azuredevops_project.team_projects,
     module.arm_environments,
     module.service_principals
   ]
