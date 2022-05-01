@@ -1,7 +1,6 @@
-tags = {
-  public       = "true"
-  demo         = "e2e-governance"
+custom_tags = {
   demo-version = "v0.5.0"
   env          = "production"
-  iac          = "terraform"
+  devops-org   = "julie-msft"
+  github       = "azure/devops-governance"
 }
