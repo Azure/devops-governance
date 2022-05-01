@@ -1,5 +1,5 @@
-# To deploy this project from a local machine, first remove
-# the `.sample` extension from this file before running the
+# To deploy this project from a local machine (without a Terraform backend),
+# first remove the `.sample` extension from this file before running the
 # `terraform init` command.
 #
 # For details see:
