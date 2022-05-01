@@ -6,12 +6,8 @@
 # - veggies-prod-*-rg  => project-veggies
 # - infra-shared-*-rg  => central-it
 
-locals {
-  project_name = split("-", var.resource_group_name)[0] == "infra" ? "central-it" : "project-${split("-", var.resource_group_name)[0]}"
-}
-
 data "azuredevops_project" "team" {
-  name = local.project_name
+  project_id = var.project_id
 }
 
 # ------------------

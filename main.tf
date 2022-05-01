@@ -139,7 +139,7 @@ resource "azuredevops_project" "collaboration" {
 module "ado_team_permissions" {
   for_each       = var.projects
   source         = "./modules/azure-devops-permissions"
-  ado_project_id = azuredevops_project.team_projects["proj_${each.value.team}"].id
+  ado_project_id = azuredevops_project.team_projects["${each.value.team}"].id
   team_aad_id    = azuread_group.groups["${each.value.team}_devs"].id   # Receives 'Contributor' Permissions
   admin_aad_id   = azuread_group.groups["${each.value.team}_admins"].id # Receives 'Project Administrator' Permissions
 
@@ -212,6 +212,7 @@ module "service_connections" {
   service_principal_id     = module.service_principals[each.key].principal_id
   service_principal_secret = module.service_principals[each.key].client_secret
   resource_group_name      = "${replace(each.key, "_", "-")}-${local.suffix}-rg"
+  project_id               = azuredevops_project.team_projects[replace(each.key, "/(_dev)|(_prod)|(_shared)/", "")].id
 
   depends_on = [
     azuread_group.groups,

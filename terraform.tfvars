@@ -22,19 +22,19 @@ groups = {
 # =======================
 
 projects = {
-  proj_fruits = {
+  fruits = {
     name        = "project-fruits"
     description = "Demo using AAD groups"
     team        = "fruits"
   }
 
-  proj_veggies = {
+  veggies = {
     name        = "project-veggies"
     description = "Demo using AAD groups"
     team        = "veggies"
   }
 
-  proj_infra = {
+  infra = {
     name        = "central-it"
     description = "Central IT managed stuff"
     team        = "infra"
