@@ -7,10 +7,11 @@ resource "azuread_application" "app" {
   owners       = var.owners
 }
 
-resource "azuread_application_password" "workspace_sp_secret" {
-  application_object_id = azuread_application.app.object_id
+resource "azuread_service_principal_password" "workspace_sp_secret" {
+  service_principal_id = azuread_service_principal.sp.object_id
 }
 
 resource "azuread_service_principal" "sp" {
   application_id = azuread_application.app.application_id
+  owners         = var.owners
 }
