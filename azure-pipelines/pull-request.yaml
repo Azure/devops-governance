@@ -10,9 +10,17 @@ pr:
 - production
 
 variables:
-  - template: ./_vars.yaml
-  - group: e2e-gov-demo-subscription-reader
-  - group: mask-ids
+  githubRepoName:       Azure/devops-governance
+  githubConnectionName: e2e-governance-demo
+
+- ${{ if eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main') }}:
+  terraformStateFile: dev-v2.tfstate
+  terraformVarFile: environments/dev.tfvars
+  devopsOrgUrl: "https://dev.azure.com/ado-gov-demo-dev"
+- ${{ if eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/production') }}:
+  terraformStateFile: prod-v2.tfstate
+  terraformVarFile: environments/prod.tfvars
+  devopsOrgUrl: "https://dev.azure.com/ado-gov-demo"
 
 stages:
 - template: ./stages/ci.yaml
@@ -20,8 +28,9 @@ stages:
 - stage: driftStage
   displayName: Detect Drift
   variables:
-    githubRepoName:       Azure/devops-governance
-    githubConnectionName: e2e-governance-demo
+  - template: ./_vars.yaml
+  - group: e2e-gov-demo-subscription-reader
+  - group: mask-ids
   jobs:
   - job: driftJob
     displayName: Terraform Plan
