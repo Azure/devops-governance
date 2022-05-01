@@ -8,7 +8,3 @@ output "resource_group" {
 output "storage_account" {
   value = azurerm_storage_account.storage.name
 }
-
-output "key_vault" {
-  value = azurerm_key_vault.kv.name
-}

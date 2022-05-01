@@ -16,7 +16,6 @@ output "aad_groups" {
 output "arm_environments" {
   value = [
     for env in module.arm_environments : {
-      key_vault       = env.key_vault
       resource_group  = env.resource_group.name
       storage_account = env.storage_account
     }
