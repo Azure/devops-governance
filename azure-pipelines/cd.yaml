@@ -26,17 +26,18 @@ variables:
 stages:
 - template: stages/ci.yaml
 
-- stage: deploy_dev
+- stage: devStage
   displayName: Deploy - Dev
   condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/fix/azure-pipelines'))
   variables:
-    terraformStateFile: dev-v2.tfstate
-    terraformStateContainer: terraform
-    terraformVarFile: environments/dev.tfvars
-    devopsOrgUrl: "https://dev.azure.com/ado-gov-demo-dev"
+  - group: e2e-gov-demo-headless-owner
   jobs:
+  - job: devJob
     variables:
-    - group: e2e-gov-demo-headless-owner
+      terraformStateFile: dev-v2.tfstate
+      terraformStateContainer: terraform
+      terraformVarFile: environments/dev.tfvars
+      devopsOrgUrl: "https://dev.azure.com/ado-gov-demo-dev"
     steps:
     - template: steps/terraform-init.yaml
     - template: steps/terraform-plan.yaml
