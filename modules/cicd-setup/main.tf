@@ -124,5 +124,6 @@ output "headless_owner_service_principal" {
   value = {
     display_name = azuread_service_principal.headless_owner.display_name
     object_id    = azuread_service_principal.headless_owner.object_id
+    client_id    = azuread_application.headless_owner.application_id
   }
 }
