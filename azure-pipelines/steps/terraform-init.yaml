@@ -4,6 +4,6 @@ steps:
     terraform init \
       -backend-config="storage_account_name=$(kv-tf-state-blob-account)" \
       -backend-config="sas_token=$(kv-tf-state-sas-token)" \
-      -backend-config="container_name=$(tf-state-container)" \
-      -backend-config="key=$(tf-state-file)"
+      -backend-config="container_name=$(terraformStateContainer)" \
+      -backend-config="key=$(terraformStateFile)"
   displayName: Terraform Init

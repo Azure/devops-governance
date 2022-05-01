@@ -1,0 +1,3 @@
+variables:
+  terraformStateContainer: terraform
+  terraformPlanFile:       deployment.tfplan
