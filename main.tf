@@ -54,6 +54,11 @@ module "arm_environments" {
   admins_group_id      = azuread_group.groups["${each.value.team}_admins"].id
   superadmins_group_id = local.superadmins_aad_object_id
   service_principal_id = module.service_principals["${each.value.team}_${each.value.env}"].principal_id
+
+  depends_on = [
+    azuread_group.groups,
+    module.service_principals
+  ]
 }
 
 # ------------
