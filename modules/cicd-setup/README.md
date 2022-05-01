@@ -46,7 +46,14 @@ headless_owner_sp = {
 
 👉 Note the **aad_superowners_group_id** value `73c74b2f-xxxx-xxxx-xxxx-xxxxxxxxxxxx` which you need for this project.
 
+## ❗️ Last Step - Grant Admin Consent
+
+The headless owner service principal will not work until you [*manually* grant "Admin content" via the Azure Portal](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/grant-admin-consent#grant-admin-consent-in-app-registrations
+).
+
+This step is manual and not automated because you should read the docs, warnings, etc. before clicking that button and accepting the security risks.
+
 ## References
 
-
 - Terraform Docs - [Azure AD Service Principal - Required API Permissions](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/service_principal#api-permissions)
+
