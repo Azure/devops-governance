@@ -20,11 +20,11 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- template: _vars.yaml
+- template: ./_vars.yaml
 - group: e2e-gov-demo-kv
 
 stages:
-- template: stages/ci.yaml
+- template: ./stages/ci.yaml
 
 - stage: devStage
   displayName: Deploy - Dev
@@ -39,9 +39,9 @@ stages:
       terraformVarFile: environments/dev.tfvars
       devopsOrgUrl: "https://dev.azure.com/ado-gov-demo-dev"
     steps:
-    - template: steps/terraform-init.yaml
-    - template: steps/terraform-plan.yaml
-    - template: steps/terraform-apply.yaml
+    - template: ./steps/terraform-init.yaml
+    - template: ./steps/terraform-plan.yaml
+    - template: ./steps/terraform-apply.yaml
 
 - stage: prodStage
   displayName: Deploy - Production
@@ -56,7 +56,7 @@ stages:
       terraformVarFile: environments/prod.tfvars
       devopsOrgUrl: "https://dev.azure.com/ado-gov-demo"
     steps:
-    - template: steps/terraform-init.yaml
-    - template: steps/terraform-plan.yaml
-    - template: steps/terraform-apply.yaml
+    - template: ./steps/terraform-init.yaml
+    - template: ./steps/terraform-plan.yaml
+    - template: ./steps/terraform-apply.yaml
 
