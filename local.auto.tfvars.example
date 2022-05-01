@@ -4,4 +4,10 @@
 # Directory group that contains both you and the priviledged service
 # principle running infrastructure as code
 
+# Key Vault wants AAD Group object_id
 superadmins_aad_object_id = "<guid>"
+
+# but Azure AD only supports user and service principal objects - not groups.
+application_owners_ids = ["<guid>", "<guid>"]
+
+# See also ./modules/cicd-setup/README.md for details.
