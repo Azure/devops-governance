@@ -10,7 +10,7 @@ pr:
 
 variables:
   - template: vars/global.yaml
-  - group: e2e-gov-demo-kv # PROD
+  - group: e2e-gov-demo-subscription-reader
   - group: mask-ids
 
 stages:
