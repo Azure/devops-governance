@@ -160,6 +160,7 @@ module "ado_supermarket_permissions_fruits" {
 
   depends_on = [
     azuread_group.groups,
+    azuredevops_project.team_projects,
     azuredevops_project.supermarket
   ]
 }
@@ -172,6 +173,7 @@ module "ado_supermarket_permissions_veggies" {
 
   depends_on = [
     azuread_group.groups,
+    azuredevops_project.team_projects,
     azuredevops_project.supermarket
   ]
 }
@@ -186,6 +188,7 @@ module "ado_collaboration_permissions_fruits" {
 
   depends_on = [
     azuread_group.groups,
+    azuredevops_project.team_projects,
     azuredevops_project.collaboration
   ]
 }
@@ -198,6 +201,7 @@ module "ado_collaboration_permissions_veggies" {
 
   depends_on = [
     azuread_group.groups,
+    azuredevops_project.team_projects,
     azuredevops_project.collaboration
   ]
 }
