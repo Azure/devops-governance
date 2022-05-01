@@ -19,6 +19,10 @@ resource "azurerm_storage_account" "storage" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   tags                     = var.tags
+
+  lifecycle {
+    ignore_changes = all # b/c ARM populates queue_properties, etc. later.
+  }
 }
 
 # -----------------------
