@@ -20,7 +20,7 @@ output "client_id" {
 }
 
 output "client_secret" {
-  value       = azuread_application_password.workspace_sp_secret.value
+  value       = azuread_service_principal_password.workspace_sp_secret.value
   description = "Client Secret for Service Principal to be imported into Key Vault"
   sensitive   = true
 }

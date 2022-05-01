@@ -17,17 +17,11 @@ variable "tenant_id" {
   default     = "Current Client Tenant ID"
 }
 
-variable "password_lifetime" {
-  type        = string
-  description = "Lifetime of password in hours, e.g. '720h'. Defaults to 6 months. After password expires, credential needs to be refreshed (but not deleted)."
-  default     = "4380h"
-}
-
-variable "owners" {
+variable "owners_list" {
   type        = list(string)
   description = "A set of object IDs of principals that will be granted ownership of the application (service principal)."
   validation {
-    condition     = length(var.owners) > 0
+    condition     = length(var.owners_list) > 0
     error_message = "Every Application must have an owner. Owners cannot be empty."
   }
 }

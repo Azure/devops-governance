@@ -36,10 +36,10 @@ resource "azuread_group" "groups" {
 # TODO: document use for CI only. Apps should use diff. SP per PILP
 
 module "service_principals" {
-  for_each = var.environments
-  source   = "./modules/service-principal"
-  name     = "${each.value.team}-${each.value.env}-${local.suffix}-ci-sp"
-  owners   = local.application_owners_ids
+  for_each    = var.environments
+  source      = "./modules/service-principal"
+  name        = "${each.value.team}-${each.value.env}-${local.suffix}-ci-sp"
+  owners_list = local.application_owners_ids
 }
 
 # ------------------------------
