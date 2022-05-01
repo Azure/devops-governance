@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azuread = {
       source  = "hashicorp/azuread"
-      version = ">=2.2.0"
+      version = ">=2.22.0"
     }
     azuredevops = {
       source  = "microsoft/azuredevops"
