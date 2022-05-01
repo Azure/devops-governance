@@ -26,6 +26,7 @@ resource "azuredevops_serviceendpoint_azurerm" "workspace_endpoint" {
   azurerm_spn_tenantid      = data.azurerm_client_config.current.tenant_id
   azurerm_subscription_id   = data.azurerm_client_config.current.subscription_id
   azurerm_subscription_name = data.azurerm_subscription.current.display_name
+
   credentials {
     serviceprincipalid  = var.service_principal_id
     serviceprincipalkey = var.service_principal_secret
