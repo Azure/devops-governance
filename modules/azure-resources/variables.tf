@@ -49,12 +49,6 @@ variable "client_object_id" {
 variable "tags" {
   description = "Tags to apply to Azure Resources"
   type        = map(string)
-  default = {
-    demo   = "governance"
-    devops = "true"
-    oss    = "terraform"
-    public = "true"
-  }
 }
 
 data "azurerm_client_config" "current" {}

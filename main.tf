@@ -16,6 +16,7 @@ locals {
   suffix                    = random_string.suffix.result
   application_owners_ids    = length(var.application_owners_ids) == 0 ? [data.azurerm_client_config.current.object_id] : var.application_owners_ids
   superadmins_aad_object_id = var.superadmins_aad_object_id == "" ? data.azurerm_client_config.current.object_id : var.superadmins_aad_object_id # Default to current ARM client
+  tags                      = merge(var.default_tags, var.custom_tags)
 }
 
 # =================
@@ -56,6 +57,7 @@ module "arm_environments" {
   admins_group_id      = azuread_group.groups["${each.value.team}_admins"].id
   superadmins_group_id = local.superadmins_aad_object_id
   service_principal_id = module.service_principals["${each.value.team}_${each.value.env}"].principal_id
+  tags                 = local.tags
 }
 
 # ==============

@@ -26,3 +26,20 @@ variable "projects" {
 variable "environments" {
   type = map(map(string))
 }
+
+variable "default_tags" {
+  description = "Tags to apply to Azure Resources"
+  type        = map(string)
+  default = {
+    public = "true"
+    demo   = "e2e-governance"
+    iac    = "terraform"
+    ci     = "azure-pipelines"
+  }
+}
+
+variable "custom_tags" {
+  description = "Extra Tags to apply to Azure Resources"
+  type        = map(string)
+  default     = {}
+}
