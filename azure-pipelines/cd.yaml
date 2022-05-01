@@ -3,53 +3,61 @@ name: $(BuildID)
 trigger:
   branches:
     include:
-    - main
-    - production
+    # - main
+    # - production
+    - fix/azure-pipelines
   paths:
     exclude:
-    - '*.md'
-    - 'backends/*'
-    - 'images/*'
     - '.github/*'
+    - 'backends/*'
+    - 'modules/cicd-setup'
+    - 'images/*'
+    - '*.md'
 
 pr: none
 
 pool:
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-latest'
 
 variables:
-- template: vars/global.yaml
-- group: mask-ids
-
-# Conditional uses ${{ }} syntax in order to be processed at compile time
-# in order to work for loading variable groups. For details see:
-# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#understand-variable-syntax
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-  - group: e2e-gov-demo-dev-kv
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
-  - group: e2e-gov-demo-kv
+  tf-state-container: terraform
+  tf-plan-file:       deployment.tfplan
 
 stages:
 - template: stages/ci.yaml
 
-- stage: cd_stage
-  displayName: CD - Deployment
+- stage: deploy_dev
+  displayName: Deploy - Dev
+  condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/fix/azure-pipelines'))
+  variables:
+  - group: e2e-gov-demo-kv
   jobs:
   - job: deploy
     displayName: Terraform Plan and Apply
+    variables:
+      tf-state-file: dev-v2.tfstate
+      tf-var-file:   environments/dev.tfvars
     steps:
-    - template: steps/debug-vars.yaml
-    - template: steps/terraform-init.yaml
-    - template: steps/terraform-plan.yaml
-      parameters:
-        extraFlags: "-out=deployment.tfplan"
+    - bash: |
+        terraform -version
+        terraform init \
+          -backend-config="storage_account_name=$(kv-tf-state-blob-account)" \
+          -backend-config="sas_token=$(kv-tf-state-sas-token)" \
+          -backend-config="container_name=$(tf-state-container)" \
+          -backend-config="key=$(tf-state-file)"
+      displayName: Terraform Init
 
-    - bash: terraform apply -auto-approve deployment.tfplan
-      displayName: Terraform Apply
+    - bash: |
+        terraform plan \
+          -var superadmins_aad_object_id=$(kv-aad-superadmins-group-id) \
+          -var 'application_owners_ids=$(kv-aad-app-owners-ids)' \
+          -var-file=$(tf-var-file) \
+          -out $(tf-plan-file)
+      displayName: Terraform Plan
       env:
         ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
         ARM_CLIENT_ID:              $(kv-arm-client-id)
         ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
         ARM_TENANT_ID:              $(kv-arm-tenant-id)
-        AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
-        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
+        AZDO_ORG_SERVICE_URL:       $(kv-ado-dev-org-url) # Dev Org
+        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-ado-pat)

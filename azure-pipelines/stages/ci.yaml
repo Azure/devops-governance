@@ -1,8 +1,8 @@
 stages:
-- stage: CIStage
+- stage: CI
   displayName: CI - Integration
   jobs:
-  - job: CIJob
+  - job:
     displayName: Terraform - Lint and Validate
     steps:
     - bash: terraform -version
