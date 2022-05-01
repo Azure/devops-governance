@@ -36,9 +36,25 @@ stages:
     displayName: Terraform - Plan and Apply
     variables:
       terraformStateFile: dev-v2.tfstate
-      terraformStateContainer: terraform
       terraformVarFile: environments/dev.tfvars
       devopsOrgUrl: "https://dev.azure.com/ado-gov-demo-dev"
+    steps:
+    - template: steps/terraform-init.yaml
+    - template: steps/terraform-plan.yaml
+    - template: steps/terraform-apply.yaml
+
+- stage: prodStage
+  displayName: Deploy - Production
+  condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/production'))
+  variables:
+  - group: e2e-gov-demo-headless-owner
+  jobs:
+  - job: prodJob
+    displayName: Terraform - Plan and Apply
+    variables:
+      terraformStateFile: prod-v2.tfstate
+      terraformVarFile: environments/prod.tfvars
+      devopsOrgUrl: "https://dev.azure.com/ado-gov-demo"
     steps:
     - template: steps/terraform-init.yaml
     - template: steps/terraform-plan.yaml
