@@ -1,11 +1,7 @@
 steps:
 - bash: |
-    terraform plan \
-      -var superadmins_aad_object_id=$(kv-aad-superadmins-group-id) \
-      -var 'application_owners_ids=$(kv-aad-app-owners-ids)' \
-      -var-file=$(terraformVarFile) \
-      -out $(terraformPlanFile)
-  displayName: Terraform Plan
+    terraform apply -auto-approve $(terraformPlanFile)
+  displayName: Terraform Apply
   env:
     ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
     ARM_CLIENT_ID:              $(kv-arm-client-id)

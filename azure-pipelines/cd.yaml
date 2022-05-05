@@ -7,49 +7,55 @@ trigger:
     - production
   paths:
     exclude:
-    - '*.md'
-    - 'backends/*'
-    - 'images/*'
     - '.github/*'
+    - 'backends/*'
+    - 'modules/cicd-setup'
+    - 'images/*'
+    - '*.md'
 
 pr: none
 
 pool:
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-latest'
 
 variables:
-- template: vars/global.yaml
-- group: mask-ids
-
-# Conditional uses ${{ }} syntax in order to be processed at compile time
-# in order to work for loading variable groups. For details see:
-# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#understand-variable-syntax
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-  - group: e2e-gov-demo-dev-kv
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/production') }}:
-  - group: e2e-gov-demo-kv
+- template: ./_vars.yaml
+- group: e2e-gov-demo-kv
 
 stages:
-- template: stages/ci.yaml
+- template: ./stages/ci.yaml
 
-- stage: cd_stage
-  displayName: CD - Deployment
+- stage: devStage
+  displayName: Deploy - Dev
+  condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+  - group: e2e-gov-demo-headless-owner
   jobs:
-  - job: deploy
-    displayName: Terraform Plan and Apply
+  - job: devJob
+    displayName: Terraform - Plan and Apply
+    variables:
+      terraformStateFile: dev-v2.tfstate
+      terraformVarFile: environments/dev.tfvars
+      devopsOrgUrl: "https://dev.azure.com/ado-gov-demo-dev"
     steps:
-    - template: steps/debug-vars.yaml
-    - template: steps/terraform-init.yaml
-    - template: steps/terraform-plan.yaml
-      parameters:
-        extraFlags: "-out=deployment.tfplan"
+    - template: ./steps/terraform-init.yaml
+    - template: ./steps/terraform-plan.yaml
+    - template: ./steps/terraform-apply.yaml
 
-    - bash: terraform apply -auto-approve deployment.tfplan
-      displayName: Terraform Apply
-      env:
-        ARM_SUBSCRIPTION_ID:        $(kv-arm-subscription-id)
-        ARM_CLIENT_ID:              $(kv-arm-client-id)
-        ARM_CLIENT_SECRET:          $(kv-arm-client-secret)
-        ARM_TENANT_ID:              $(kv-arm-tenant-id)
-        AZDO_ORG_SERVICE_URL:       $(kv-azure-devops-org-url)
-        AZDO_PERSONAL_ACCESS_TOKEN: $(kv-azure-devops-pat)
+- stage: prodStage
+  displayName: Deploy - Production
+  condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/production'))
+  variables:
+  - group: e2e-gov-demo-headless-owner
+  jobs:
+  - job: prodJob
+    displayName: Terraform - Plan and Apply
+    variables:
+      terraformStateFile: prod-v2.tfstate
+      terraformVarFile: environments/prod.tfvars
+      devopsOrgUrl: "https://dev.azure.com/ado-gov-demo"
+    steps:
+    - template: ./steps/terraform-init.yaml
+    - template: ./steps/terraform-plan.yaml
+    - template: ./steps/terraform-apply.yaml
+

@@ -1,0 +1,10 @@
+variables:
+  terraformStateContainer: terraform
+  terraformPlanFile:       deployment.tfplan
+  isPR:                    ${{ eq(variables['Build.Reason'], 'PullRequest') }}
+
+  # Unused - but kept here for reference
+  isFork:        ${{ eq(variables['System.PullRequest.IsFork'], 'True') }}
+  isTrustedCode: ${{ eq(variables.isFork, 'False') }}
+  isScheduled:   ${{ eq(variables['Build.Reason'], 'Schedule') }}
+  isTrustedCI:   ${{ and( eq(variables.isFork,'False'), eq(variables.isPR,'False'), eq(variables.isScheduled,'False') ) }}

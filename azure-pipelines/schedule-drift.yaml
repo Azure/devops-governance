@@ -26,6 +26,6 @@ steps:
 - template: steps/debug-vars.yaml
 - template: steps/confirm-kv-loaded.yaml
 - template: steps/terraform-init.yaml
-- template: steps/terraform-plan.yaml
+- template: steps/terraform-plan.yaml # changed, so now broken.
   parameters:
     extraFlags: -detailed-exitcode # Drift Detection

@@ -7,13 +7,13 @@ trigger:
     - fix/*
   paths:
     exclude:
-    - '*.md'
-    - 'backends/*'
-    - 'images/*'
     - '.github/*'
-
+    - 'backends/*'
+    - 'modules/cicd-setup'
+    - 'images/*'
+    - '*.md'
 pool:
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-latest'
 
 stages:
-- template: stages/ci.yaml
+- template: ./stages/ci.yaml
