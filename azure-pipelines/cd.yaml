@@ -3,9 +3,8 @@ name: $(BuildID)
 trigger:
   branches:
     include:
-    # - main
-    # - production
-    - fix/azure-pipelines
+    - main
+    - production
   paths:
     exclude:
     - '.github/*'
@@ -28,7 +27,7 @@ stages:
 
 - stage: devStage
   displayName: Deploy - Dev
-  condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/fix/azure-pipelines'))
+  condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   variables:
   - group: e2e-gov-demo-headless-owner
   jobs:
