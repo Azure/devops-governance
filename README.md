@@ -44,13 +44,13 @@ The Terraform Infrastructure as Code in this repository will bootstrap various r
 
 #### Random Generated Suffix
 
-When run Terraform will create the following resources. Note: random suffix used to ensure globally unique names, e.g. `u6t7` but are omitted here for clarity.
+When ran, Terraform will create the following resources. Note: random suffix are used to ensure globally unique names, e.g. `u6t7` but are omitted here for clarity.
 
 ### Azure AD Groups
 
 The key to end to end governance is to have _multiple_ role assignments (with different role definitions and different resource scopes to the same Azure AD groups) as illustrated below. 
 
-To understand the benefits, imagine if you had to remove a contractor after completion of a project. If you use the concept described in this project and in the accompanying [official Microsoft documentation](https://aka.ms/architecture-e2e-governance), you can remove their access from multiple environments and resources simply by removing their membership to AAD group(s).
+To understand the benefits, imagine you had to remove a contractor after completion of a project. If you use the concept described in this project and in the accompanying [official Microsoft documentation](https://aka.ms/architecture-e2e-governance), you can remove their access from multiple environments and resources simply by removing their membership to AAD group(s).
 
 [![Multiple Role Assignments](./images/2021-06-role-assignments.svg)](https://aka.ms/caf-e2e-devops)
 
@@ -97,7 +97,7 @@ _Screenshot of the Azure DevOps organization created by this code sample. Icons 
 - **Service Connection** using Contributor Service Principal
 - **Service Connection** using Key Vault read-only Service Principal for Pipeline Secrets Integration
 
-Note: At time of this writing there is [no REST API (v6) for Key Vault Integration](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/variablegroups/add?view=azure-devops-rest-6.0). Therefore it must be [configured manually](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/azure-key-vault?view=azure-devops). 
+Note: At the time of this writing there is [no REST API (v6) for Key Vault Integration](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/variablegroups/add?view=azure-devops-rest-6.0). Therefore it must be [configured manually](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/azure-key-vault?view=azure-devops). 
 
 
 ### Azure Resource Groups as "Environments"
@@ -114,7 +114,7 @@ Be aware that in practice per [Cloud Adoption Framework](https://docs.microsoft.
 
 # Contributing
 
-This demo was created with &hearts; by the FastTrack engineer [Julie Ng](https://github.com/julie-ng) and based on previous experience as an Enterprise Architct and current experieince with Azure customers new to CI/CD and DevOps. After regularly breaking and fixing the demo in onboarding sessions, it was automated.
+This demo was created with &hearts; by the FastTrack engineer [Julie Ng](https://github.com/julie-ng) and based on previous experience as an Enterprise Architect and current experience with Azure customers new to CI/CD and DevOps. After regularly breaking and fixing the demo in onboarding sessions, it was automated.
 
 Learn more about [FastTrack for Azure &rarr;](https://aka.ms/fasttrackforazure)
 
