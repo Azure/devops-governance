@@ -54,7 +54,7 @@ These values can be set locally. See [`local.auto.tfvars`](./../../../devops-gov
 
 ## ❗️ Last Step - Grant Admin Consent
 
-The headless owner service principal will not work until you [*manually* grant "Admin content" via the Azure Portal](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/grant-admin-consent#grant-admin-consent-in-app-registrations
+The headless owner service principal will not work until you [*manually* grant "Admin consent" via the Azure Portal](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/grant-admin-consent#grant-admin-consent-in-app-registrations
 ).
 
 This step is manual and not automated because you should read the docs, warnings, etc. before clicking that button and accepting the security risks.
